@@ -36,15 +36,13 @@ to setup
   set-default-shape nodes "circle"
   ;create-nodes number-of-nodes [set color blue]
 
-  create-nodes number-of-adversarial [
-    set shape "square" ;; squares are adversarial
-    set is_adversarial true
-  ]
-  create-nodes number-of-nodes - number-of-adversarial [
-    set is_adversarial false
-  ]
+  link-formation
 
-  ask nodes [set color ((random number-of-colors) * 10 + 5)]
+  ask nodes [
+    set color ((random number-of-colors) * 10 + 5)
+    set label word "my color is " color
+    set label-color 0
+  ]
 
   ;; make a list of the possible colors
   set possible-colors (list 5)
@@ -76,6 +74,8 @@ to go
 
   ask nodes [
    naively-choose-color self
+
+   set label word "my color is " color
   ]
 
   tick
@@ -104,8 +104,7 @@ to disconnect-randomly
 end
 
 to naively-choose-color [a_node]
-  let best-count 0
-  let worst-count 0
+
   let best-color [color] of a_node
   let worst-color [color] of a_node
 
@@ -114,23 +113,19 @@ to naively-choose-color [a_node]
 
     if (not empty? node-neighbor-colors)[
       set best-color item 0 (modes node-neighbor-colors)
-      set worst-color (best-color + 10) mod (number-of-colors * 10 + 5)
+      set worst-color one-of possible-colors;(best-color + 10) mod (number-of-colors * 10 + 5)
 
       ;show word "best color " best-color
       ;show word "worst color " worst-color
+      show is_adversarial
 
-      ifelse is_adversarial [
+      ifelse (is_adversarial = 1) [
         set color worst-color
       ] [ ;; this is the else block
         set color best-color
       ]
     ]
-
-
   ]
-
-
-  ;ask neighbors of a_node
 
 end
 
@@ -138,6 +133,56 @@ end
 
 
 ;;;;;;;;;;;;;;;;;; END OF HELPER FUNCTIONS and START OF UTILS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to link-formation
+  if initial-network-structure = "disconnected"[
+    show "nothing happens here, but it isnt a return so I'm printing"
+    create-nodes number-of-adversarial [
+      set shape "square" ;; squares are adversarial
+      set is_adversarial true
+    ]
+    create-nodes number-of-nodes - number-of-adversarial [
+      set is_adversarial false
+    ]
+  ]
+
+  if initial-network-structure = "random" [
+   nw:generate-random nodes links number-of-nodes ((number-of-nodes * number-of-links) / (number-of-nodes * (number-of-nodes - 1)))
+
+    repeat number-of-adversarial [ ;; this is wrong because consider the case where a node is randomly chosen multiple times
+      change-node-to-adversarial one-of nodes
+    ]
+  ]
+  if initial-network-structure = "small-world" [
+    nw:generate-watts-strogatz nodes links number-of-nodes number-of-links 0.3 ;;0.3 is the rewiring-probability
+    repeat number-of-adversarial [ ;; this is wrong because consider the case where a node is randomly chosen multiple times
+      change-node-to-adversarial one-of nodes
+    ]
+  ]
+  if initial-network-structure = "regular" [
+    nw:generate-ring nodes links number-of-nodes
+    repeat number-of-adversarial [ ;; this is wrong because consider the case where a node is randomly chosen multiple times
+      change-node-to-adversarial one-of nodes
+    ]
+  ]
+  if initial-network-structure = "preferential"[
+    ;; still need to change link-breed to direct
+    nw:generate-preferential-attachment nodes links number-of-nodes
+    repeat number-of-adversarial [ ;; this is wrong because consider the case where a node is randomly chosen multiple times
+      change-node-to-adversarial one-of nodes
+    ]
+  ]
+
+end
+
+to change-node-to-adversarial [a-node]
+  ask a-node [
+    set shape "square" ;; squares are adversarial
+    set is_adversarial 1
+    show is_adversarial
+  ]
+
+end
 
 to remove-links-between [ a b ]
    ask a [ ask my-links with [ other-end = b ] [ die ] ]
@@ -179,7 +224,7 @@ number-of-nodes
 number-of-nodes
 3
 25
-22.0
+3.0
 1
 1
 NIL
@@ -194,7 +239,7 @@ number-of-adversarial
 number-of-adversarial
 1
 10
-3.0
+1.0
 1
 1
 NIL
@@ -260,7 +305,7 @@ number-of-colors
 number-of-colors
 1
 13
-9.0
+4.0
 1
 1
 NIL
@@ -283,6 +328,42 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot (count nodes with [color = item 0 (modes [color] of nodes)]) / number-of-nodes "
+
+MONITOR
+735
+422
+806
+467
+NIL
+count links
+17
+1
+11
+
+CHOOSER
+31
+140
+188
+185
+initial-network-structure
+initial-network-structure
+"disconnected" "preferential" "small-world" "regular" "random"
+2
+
+SLIDER
+26
+202
+198
+235
+number-of-links
+number-of-links
+0
+10
+1.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
