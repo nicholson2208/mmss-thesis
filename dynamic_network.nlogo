@@ -69,11 +69,13 @@ end
 
 to go
 
-  connect-randomly
-  disconnect-randomly
+  if (not is-network-fixed)[
+    connect-randomly ;; this is where I am going to have a big switch statement to pick different strategies
+    disconnect-randomly
+  ]
 
   ask nodes [
-   naively-choose-color self
+   naively-choose-color self  ;; this is where I am going to have a big switch statement to pick different strategies
 
    set label word "my color is " color
   ]
@@ -160,7 +162,7 @@ to link-formation
     ]
   ]
   if initial-network-structure = "regular" [
-    nw:generate-ring nodes links number-of-nodes
+    nw:generate-watts-strogatz nodes links number-of-nodes number-of-links 0
     repeat number-of-adversarial [ ;; this is wrong because consider the case where a node is randomly chosen multiple times
       change-node-to-adversarial one-of nodes
     ]
@@ -224,7 +226,7 @@ number-of-nodes
 number-of-nodes
 3
 25
-3.0
+20.0
 1
 1
 NIL
@@ -239,7 +241,7 @@ number-of-adversarial
 number-of-adversarial
 1
 10
-1.0
+5.0
 1
 1
 NIL
@@ -305,7 +307,7 @@ number-of-colors
 number-of-colors
 1
 13
-4.0
+13.0
 1
 1
 NIL
@@ -359,11 +361,22 @@ number-of-links
 number-of-links
 0
 10
-1.0
+3.0
 1
 1
 NIL
 HORIZONTAL
+
+SWITCH
+30
+242
+176
+275
+is-network-fixed
+is-network-fixed
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
