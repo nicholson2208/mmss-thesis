@@ -119,7 +119,7 @@ to naively-choose-color [a_node]
 
       ;show word "best color " best-color
       ;show word "worst color " worst-color
-      show is_adversarial
+      ;show is_adversarial
 
       ifelse (is_adversarial = 1) [
         set color worst-color
@@ -149,41 +149,32 @@ to link-formation
   ]
 
   if initial-network-structure = "random" [
-   nw:generate-random nodes links number-of-nodes ((number-of-nodes * number-of-links) / (number-of-nodes * (number-of-nodes - 1)))
-
-    repeat number-of-adversarial [ ;; this is wrong because consider the case where a node is randomly chosen multiple times
-      change-node-to-adversarial one-of nodes
-    ]
+    nw:generate-random nodes links number-of-nodes ((number-of-nodes * number-of-links) / (number-of-nodes * (number-of-nodes - 1)))
+    change-node-to-adversarial number-of-adversarial
   ]
+
   if initial-network-structure = "small-world" [
     nw:generate-watts-strogatz nodes links number-of-nodes number-of-links 0.3 ;;0.3 is the rewiring-probability
-    repeat number-of-adversarial [ ;; this is wrong because consider the case where a node is randomly chosen multiple times
-      change-node-to-adversarial one-of nodes
-    ]
+    change-node-to-adversarial number-of-adversarial
   ]
   if initial-network-structure = "regular" [
     nw:generate-watts-strogatz nodes links number-of-nodes number-of-links 0
-    repeat number-of-adversarial [ ;; this is wrong because consider the case where a node is randomly chosen multiple times
-      change-node-to-adversarial one-of nodes
-    ]
+    change-node-to-adversarial number-of-adversarial
   ]
+
   if initial-network-structure = "preferential"[
-    ;; still need to change link-breed to direct
+    ;; still need to change link-breed to direct, should I?? I think maybe no
     nw:generate-preferential-attachment nodes links number-of-nodes
-    repeat number-of-adversarial [ ;; this is wrong because consider the case where a node is randomly chosen multiple times
-      change-node-to-adversarial one-of nodes
-    ]
+    change-node-to-adversarial number-of-adversarial
   ]
 
 end
 
-to change-node-to-adversarial [a-node]
-  ask a-node [
-    set shape "square" ;; squares are adversarial
-    set is_adversarial 1
-    show is_adversarial
-  ]
-
+to change-node-to-adversarial [n]
+  ask n-of n nodes [
+      set shape "square" ;; squares are adversarial
+      set is_adversarial 1
+    ]
 end
 
 to remove-links-between [ a b ]
@@ -225,8 +216,8 @@ SLIDER
 number-of-nodes
 number-of-nodes
 3
-25
-20.0
+100
+6.0
 1
 1
 NIL
@@ -240,8 +231,8 @@ SLIDER
 number-of-adversarial
 number-of-adversarial
 1
-10
-5.0
+number-of-nodes
+2.0
 1
 1
 NIL
@@ -343,14 +334,14 @@ count links
 11
 
 CHOOSER
-31
-140
-188
-185
+25
+120
+182
+165
 initial-network-structure
 initial-network-structure
 "disconnected" "preferential" "small-world" "regular" "random"
-2
+1
 
 SLIDER
 26
@@ -360,8 +351,8 @@ SLIDER
 number-of-links
 number-of-links
 0
-10
-3.0
+number-of-nodes - 1
+1.0
 1
 1
 NIL
@@ -374,9 +365,35 @@ SWITCH
 275
 is-network-fixed
 is-network-fixed
+0
+1
+-1000
+
+SWITCH
+23
+326
+177
+359
+enforce-max-links
+enforce-max-links
 1
 1
 -1000
+
+SLIDER
+24
+290
+196
+323
+max-links
+max-links
+1
+number-of-nodes
+2.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
