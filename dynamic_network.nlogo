@@ -13,8 +13,15 @@ breed [ nodes node ]
 nodes-own [
   ;; Think about what variables need to be in here
 
-  is_adversarial  ;; a BOOLEAN indication of whether or not a node is adversarial
+  is-adversarial  ;; a int indication of whether or not a node is adversarial
   ; reputation information
+
+  ; should I have somethng here to make them update once per time step? like right now it is kind of acting continuously because the later updates can see the first updates in the round
+  last-time-color-changed
+
+  last-time-links-changed
+
+  ; should links be directed?
 
 ]
 
@@ -42,6 +49,7 @@ to setup
     set color ((random number-of-colors) * 10 + 5)
     set label word "my color is " color
     set label-color 0
+    set size 2
   ]
 
   ;; make a list of the possible colors
@@ -70,14 +78,28 @@ end
 to go
 
   if (not is-network-fixed)[
-    connect-randomly ;; this is where I am going to have a big switch statement to pick different strategies
-    disconnect-randomly
+    if (connection-strategy = "random") [ ;; maybe have one for adversaries and cooperators??
+      ask nodes with [is-adversarial = 0][ ;; maybe put this on the outside of the switch statements
+        connect-randomly ;; this is where I am going to have a big switch statement to pick different strategies
+        disconnect-randomly
+      ]
+
+      ask nodes with [is-adversarial = 1][
+        connect-randomly ;; this is where I am going to have a big switch statement to pick different strategies
+        disconnect-randomly
+      ]
+
+    ]
   ]
 
-  ask nodes [
-   naively-choose-color self  ;; this is where I am going to have a big switch statement to pick different strategies
+  ask nodes with [is-adversarial = 0][ ;; maybe put this on the outside of the switch statements
+    majority-vote-choose-color self  ;; this is where I am going to have a big switch statement to pick different strategies
+    set label word "Coop color is " color
+  ]
 
-   set label word "my color is " color
+  ask nodes with [is-adversarial = 1][
+    majority-vote-choose-color self  ;; this is where I am going to have a big switch statement to pick different strategies
+    set label word "Adver color is " color
   ]
 
   tick
@@ -105,7 +127,7 @@ to disconnect-randomly
   remove-links-between (node (random number-of-nodes)) (node (random number-of-nodes))
 end
 
-to naively-choose-color [a_node]
+to majority-vote-choose-color [a_node]
 
   let best-color [color] of a_node
   let worst-color [color] of a_node
@@ -119,9 +141,9 @@ to naively-choose-color [a_node]
 
       ;show word "best color " best-color
       ;show word "worst color " worst-color
-      ;show is_adversarial
+      ;show is-adversarial
 
-      ifelse (is_adversarial = 1) [
+      ifelse (is-adversarial = 1) [
         set color worst-color
       ] [ ;; this is the else block
         set color best-color
@@ -141,10 +163,10 @@ to link-formation
     show "nothing happens here, but it isnt a return so I'm printing"
     create-nodes number-of-adversarial [
       set shape "square" ;; squares are adversarial
-      set is_adversarial true
+      set is-adversarial true
     ]
     create-nodes number-of-nodes - number-of-adversarial [
-      set is_adversarial false
+      set is-adversarial false
     ]
   ]
 
@@ -172,8 +194,10 @@ end
 
 to change-node-to-adversarial [n]
   ask n-of n nodes [
-      set shape "square" ;; squares are adversarial
-      set is_adversarial 1
+    set shape "square" ;; squares are adversarial
+    set is-adversarial 1
+    set size 2
+
     ]
 end
 
@@ -182,9 +206,9 @@ to remove-links-between [ a b ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+444
 10
-647
+881
 448
 -1
 -1
@@ -202,46 +226,46 @@ GRAPHICS-WINDOW
 16
 -16
 16
-0
-0
+1
+1
 1
 ticks
 30.0
 
 SLIDER
-17
-10
-189
+3
 43
+175
+76
 number-of-nodes
 number-of-nodes
 3
 100
-6.0
+21.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-18
-48
-191
+4
 81
+177
+114
 number-of-adversarial
 number-of-adversarial
-1
+0
 number-of-nodes
-2.0
+1.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-654
+888
 12
-717
+951
 45
 NIL
 setup
@@ -256,9 +280,9 @@ NIL
 1
 
 BUTTON
-796
+1030
 12
-859
+1093
 45
 NIL
 go
@@ -273,9 +297,9 @@ NIL
 1
 
 BUTTON
-720
+954
 12
-795
+1029
 45
 go once
 go
@@ -290,10 +314,10 @@ NIL
 1
 
 SLIDER
-18
-84
-190
+4
 117
+176
+150
 number-of-colors
 number-of-colors
 1
@@ -305,9 +329,9 @@ NIL
 HORIZONTAL
 
 PLOT
-674
+908
 106
-1138
+1372
 365
 Proportion of matched colors
 NIL
@@ -321,12 +345,13 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot (count nodes with [color = item 0 (modes [color] of nodes)]) / number-of-nodes "
+"coop-proportion" 1.0 0 -14835848 true " " "plot (count nodes with [is-adversarial = 0]) / (number-of-nodes) "
 
 MONITOR
-735
-422
-806
-467
+907
+57
+978
+102
 NIL
 count links
 17
@@ -334,35 +359,35 @@ count links
 11
 
 CHOOSER
-25
-120
-182
-165
+11
+153
+168
+198
 initial-network-structure
 initial-network-structure
 "disconnected" "preferential" "small-world" "regular" "random"
-1
+2
 
 SLIDER
-26
+5
 202
-198
+177
 235
 number-of-links
 number-of-links
 0
 number-of-nodes - 1
-1.0
+3.0
 1
 1
 NIL
 HORIZONTAL
 
 SWITCH
-30
-242
-176
-275
+224
+48
+370
+81
 is-network-fixed
 is-network-fixed
 0
@@ -370,10 +395,10 @@ is-network-fixed
 -1000
 
 SWITCH
-23
-326
-177
-359
+214
+121
+368
+154
 enforce-max-links
 enforce-max-links
 1
@@ -381,10 +406,10 @@ enforce-max-links
 -1000
 
 SLIDER
-24
-290
-196
-323
+207
+85
+379
+118
 max-links
 max-links
 1
@@ -394,6 +419,76 @@ number-of-nodes
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+7
+10
+157
+68
+Setup Params
+24
+0.0
+1
+
+TEXTBOX
+206
+10
+403
+68
+In-game Params
+24
+0.0
+1
+
+CHOOSER
+221
+156
+359
+201
+connection-strategy
+connection-strategy
+"random"
+0
+
+CHOOSER
+192
+232
+405
+277
+cooperator-color-change-strategy
+cooperator-color-change-strategy
+"majority vote"
+0
+
+CHOOSER
+192
+280
+401
+325
+adversary-color-change-strategy
+adversary-color-change-strategy
+"anti majority vote"
+0
+
+TEXTBOX
+262
+36
+350
+54
+Network params
+11
+0.0
+1
+
+TEXTBOX
+253
+218
+403
+236
+Color params
+11
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
