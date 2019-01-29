@@ -3,6 +3,11 @@
 ;; In this file, I am trying to make a model of a dynamic network. On this dynamic network, a color coordination task will happen. This will either be the color matching game, or the graph coloring game.
 ;; I think there should be one type of object, a node.
 
+;; Right now each node changes in sequence, so the nodes at the end see
+;; Add reputation information
+;; at some point need to think about how links can form
+
+
 extensions [
   ;csv
   table
@@ -14,7 +19,9 @@ nodes-own [
   ;; Think about what variables need to be in here
 
   is-adversarial  ;; a int indication of whether or not a node is adversarial
+
   ; reputation information
+  history-dict ;; a table of (other nodes, number-of-times-colors-matched)
 
   ; should I have somethng here to make them update once per time step? like right now it is kind of acting continuously because the later updates can see the first updates in the round
   last-time-color-changed
@@ -45,12 +52,7 @@ to setup
 
   link-formation
 
-  ask nodes [
-    set color ((random number-of-colors) * 10 + 5)
-    set label word "my color is " color
-    set label-color 0
-    set size 2
-  ]
+  node-setup
 
   ;; make a list of the possible colors
   set possible-colors (list 5)
@@ -68,6 +70,22 @@ to setup
   ;; for now, start with all unconnected
 
 
+end
+
+
+to node-setup
+  ask nodes [
+    set color ((random number-of-colors) * 10 + 5)
+    set label word "my color is " color
+    set label-color 0
+    set size 2
+
+    ;; maybe put an if statement here
+    set history-dict table:make
+
+    init-table self history-dict 0 ;; initialize table so each has a key for every other node
+    ;; show history-dict
+  ]
 end
 
 ;;circle layout
@@ -108,6 +126,44 @@ end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;; START OF HELPER FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+to update-reputational-information [a-node]
+  ; get all of the colors of the neighbors, if different, add one to my dictionary
+
+
+
+  ask a-node [
+    let my-color color
+
+    let ids-to-increment [who] of link-neighbors with [color != my-color]
+
+    foreach ids-to-increment [ x ->
+      let old-disagree-count table:get history-dict x
+
+      table:put history-dict x old-disagree-count + 1
+    ]
+
+    show history-dict
+  ]
+
+
+
+;  let my-id [who] of a-node
+;
+;  let neighbor-ids [who] of link-neighbors
+;  let neighbor-colors [color]
+;
+;
+;  ask nodes with [who != my-id][
+;    let old-disagree-count table:get history-dict [who] of other-node
+;
+;    show "disagree count"
+;    show old-disagree-count
+;
+;    table:put history-dict [who] of other-node old-disagree-count + 1
+;  ]
+
+end
+
 
 ;; writing these function to be intelligent is the hard part
 to connect-randomly
@@ -132,10 +188,12 @@ to majority-vote-choose-color [a_node]
   let best-color [color] of a_node
   let worst-color [color] of a_node
 
-  ask a_node[
+  ask a_node [
+    update-reputational-information self
     let node-neighbor-colors [color] of link-neighbors
 
     if (not empty? node-neighbor-colors)[
+
       set best-color item 0 (modes node-neighbor-colors)
       set worst-color one-of possible-colors;(best-color + 10) mod (number-of-colors * 10 + 5)
 
@@ -204,6 +262,19 @@ end
 to remove-links-between [ a b ]
    ask a [ ask my-links with [ other-end = b ] [ die ] ]
 end
+
+to init-table [a-node a-table init-val]
+  ;; initializes the histroy dict with all the other nodes as a key and 0 for the value
+  ;; show a-node
+  let my-id who
+
+  ask nodes with [who != my-id] [
+    table:put a-table who init-val
+  ]
+
+  ; show a-table
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 444
@@ -241,7 +312,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-21.0
+8.0
 1
 1
 NIL
@@ -255,8 +326,8 @@ SLIDER
 number-of-adversarial
 number-of-adversarial
 0
-number-of-nodes
-1.0
+25
+3.0
 1
 1
 NIL
@@ -376,8 +447,8 @@ SLIDER
 number-of-links
 number-of-links
 0
-number-of-nodes - 1
-3.0
+20
+2.0
 1
 1
 NIL
@@ -390,7 +461,7 @@ SWITCH
 81
 is-network-fixed
 is-network-fixed
-0
+1
 1
 -1000
 
@@ -419,16 +490,6 @@ number-of-nodes
 1
 NIL
 HORIZONTAL
-
-TEXTBOX
-7
-10
-157
-68
-Setup Params
-24
-0.0
-1
 
 TEXTBOX
 206
@@ -486,6 +547,16 @@ TEXTBOX
 403
 236
 Color params
+11
+0.0
+1
+
+TEXTBOX
+35
+15
+185
+33
+Setup params
 11
 0.0
 1
