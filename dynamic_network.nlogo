@@ -1,10 +1,9 @@
 ;;@author: Matt Nicholson
 
-;; In this file, I am trying to make a model of a dynamic network. On this dynamic network, a color coordination task will happen. This will either be the color matching game, or the graph coloring game.
+;; In this file, I am trying to make a model of a dynamic network. On this dynamic network, a color coordination task will happen. This will either be the color matching game.
 ;; I think there should be one type of object, a node.
 
 ;; Right now each node changes in sequence, so the nodes at the end see
-;; Add reputation information
 ;; at some point need to think about how links can form
 
 
@@ -65,10 +64,6 @@ to setup
 
   layout ;; make it at least look pretty
 
-  ;; do actual important setup shit here
-  ;; probably start with some different network structures here
-  ;; for now, start with all unconnected
-
 
 end
 
@@ -83,7 +78,7 @@ to node-setup
     ;; maybe put an if statement here
     set history-dict table:make
 
-    init-table self history-dict 0 ;; initialize table so each has a key for every other node
+    init-table self history-dict [0 0 0] ;; initialize table so each has a key for every other node and [prop mess-up-count total-count]
     ;; show history-dict
   ]
 end
@@ -146,12 +141,24 @@ to update-reputational-information [a-node]
   ask a-node [
     let my-color color
 
-    let ids-to-increment [who] of link-neighbors with [color != my-color]
+    let ids-to-increment [who] of link-neighbors
 
     foreach ids-to-increment [ x ->
-      let old-disagree-count table:get history-dict x
+      let history-list table:get history-dict x ; history-list is [prop messups total-count]
 
-      table:put history-dict x old-disagree-count + 1
+      let old-disagree-count item 1 history-list
+      let old-total-count item 2 history-list
+      let new-disagree-count old-disagree-count
+
+      if [color] of (node x) != my-color [
+        set new-disagree-count old-disagree-count + 1
+      ]
+
+      let new-total-count old-total-count + 1
+
+      let proportion-of-disagrees new-disagree-count / new-total-count
+
+      table:put history-dict x (list proportion-of-disagrees new-disagree-count new-total-count)
     ]
 
     ;; show history-dict
@@ -166,7 +173,7 @@ to connect-randomly
   let to-node (random number-of-nodes)
 
   ask node from-node [
-    if ((to-node != from-node and not (link-neighbor? node to-node))) [
+    if (to-node != from-node and not (link-neighbor? node to-node) and (count link-neighbors <= max-links)) [
       create-link-with node to-node
     ]
   ]
@@ -176,7 +183,7 @@ to disconnect-using-reputation [a-node]
   ; using the history-dict
 
   ask a-node [
-    let bad-people-key get-top-n-from-table history-dict 5
+    let bad-people-key get-top-n-from-table history-dict max-links
 
     foreach bad-people-key [suspected-bad-person ->
       remove-links-between (node who) (node suspected-bad-person)
@@ -286,9 +293,9 @@ end
 
 
 to-report get-top-n-from-table [table n]
-  ; returns a list of keys is the dictionary with the top n values
+  ; returns a list of keys of the dictionary with the top n values
 
-  let top-n-values sublist (sort-by > (table:values table)) 0 n
+  let top-n-values sublist (sort-by > (map first table:values table)) 0 n
 
   let top-keys (list )
 
@@ -341,7 +348,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-23.0
+43.0
 1
 1
 NIL
@@ -356,7 +363,7 @@ number-of-adversarial
 number-of-adversarial
 0
 25
-1.0
+25.0
 1
 1
 NIL
@@ -422,7 +429,7 @@ number-of-colors
 number-of-colors
 1
 13
-5.0
+13.0
 1
 1
 NIL
@@ -444,7 +451,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot (count nodes with [color = item 0 (modes [color] of nodes)]) / number-of-nodes "
+"default" 1.0 0 -16777216 true "" "plot (count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes)]) / number-of-nodes "
 "coop-proportion" 1.0 0 -14835848 true " " "plot (count nodes with [is-adversarial = 0]) / (number-of-nodes) "
 
 MONITOR
@@ -477,7 +484,7 @@ number-of-links
 number-of-links
 0
 20
-2.0
+4.0
 1
 1
 NIL
@@ -501,7 +508,7 @@ SWITCH
 154
 enforce-max-links
 enforce-max-links
-1
+0
 1
 -1000
 
@@ -514,7 +521,7 @@ max-links
 max-links
 1
 number-of-nodes
-2.0
+3.0
 1
 1
 NIL
@@ -538,7 +545,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-1
+0
 
 CHOOSER
 192
