@@ -96,7 +96,7 @@ end
 to go
 
   if (not is-network-fixed)[
-    if (connection-strategy = "random") [ ;; maybe have one for adversaries and cooperators??
+    ifelse (connection-strategy = "random") [ ;; maybe have one for adversaries and cooperators??
       ask nodes with [is-adversarial = 0][ ;; maybe put this on the outside of the switch statements
         connect-randomly ;; this is where I am going to have a big switch statement to pick different strategies
         disconnect-randomly
@@ -107,6 +107,19 @@ to go
         disconnect-randomly
       ]
 
+      ] [ ; the else block
+      if (connection-strategy = "reputation") [
+        ask nodes with [is-adversarial = 0][
+          connect-randomly
+          disconnect-using-reputation self
+        ]
+
+        ask nodes with [is-adversarial = 1][
+          connect-randomly ;; maybe make it so you have to consent to connect
+          disconnect-randomly
+        ]
+
+      ]
     ]
   ]
 
@@ -126,10 +139,9 @@ end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;; START OF HELPER FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
 to update-reputational-information [a-node]
   ; get all of the colors of the neighbors, if different, add one to my dictionary
-
-
 
   ask a-node [
     let my-color color
@@ -142,28 +154,10 @@ to update-reputational-information [a-node]
       table:put history-dict x old-disagree-count + 1
     ]
 
-    show history-dict
+    ;; show history-dict
   ]
 
-
-
-;  let my-id [who] of a-node
-;
-;  let neighbor-ids [who] of link-neighbors
-;  let neighbor-colors [color]
-;
-;
-;  ask nodes with [who != my-id][
-;    let old-disagree-count table:get history-dict [who] of other-node
-;
-;    show "disagree count"
-;    show old-disagree-count
-;
-;    table:put history-dict [who] of other-node old-disagree-count + 1
-;  ]
-
 end
-
 
 ;; writing these function to be intelligent is the hard part
 to connect-randomly
@@ -176,6 +170,20 @@ to connect-randomly
       create-link-with node to-node
     ]
   ]
+end
+
+to disconnect-using-reputation [a-node]
+  ; using the history-dict
+
+  ask a-node [
+    let bad-people-key get-top-n-from-table history-dict 5
+
+    foreach bad-people-key [suspected-bad-person ->
+      remove-links-between (node who) (node suspected-bad-person)
+    ]
+
+  ]
+
 end
 
 to disconnect-randomly
@@ -264,7 +272,7 @@ to remove-links-between [ a b ]
 end
 
 to init-table [a-node a-table init-val]
-  ;; initializes the histroy dict with all the other nodes as a key and 0 for the value
+  ;; initializes the history dict with all the other nodes as a key and 0 for the value
   ;; show a-node
   let my-id who
 
@@ -273,6 +281,27 @@ to init-table [a-node a-table init-val]
   ]
 
   ; show a-table
+
+end
+
+
+to-report get-top-n-from-table [table n]
+  ; returns a list of keys is the dictionary with the top n values
+
+  let top-n-values sublist (sort-by > (table:values table)) 0 n
+
+  let top-keys (list )
+
+  foreach table:keys table [key ->
+    let this-number table:get table key
+
+    if (member? this-number top-n-values) and (not member? key top-keys) [
+
+      set top-keys fput key top-keys
+    ]
+  ]
+
+  report top-keys
 
 end
 @#$#@#$#@
@@ -312,7 +341,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-8.0
+23.0
 1
 1
 NIL
@@ -327,7 +356,7 @@ number-of-adversarial
 number-of-adversarial
 0
 25
-3.0
+1.0
 1
 1
 NIL
@@ -393,7 +422,7 @@ number-of-colors
 number-of-colors
 1
 13
-13.0
+5.0
 1
 1
 NIL
@@ -508,8 +537,8 @@ CHOOSER
 201
 connection-strategy
 connection-strategy
-"random"
-0
+"random" "reputation"
+1
 
 CHOOSER
 192
