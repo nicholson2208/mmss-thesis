@@ -43,6 +43,9 @@ directed-link-breed [edges edge]
 
 globals [
  possible-colors ;; a list of all of the possible colors, should be of length number-of-colors
+ coop-prop
+ curr-prog
+ last-mismatch-time
 ]
 
 
@@ -56,6 +59,7 @@ to setup
 
   set-default-shape nodes "circle"
   ;create-nodes number-of-nodes [set color blue]
+  set last-mismatch-time 0
 
   link-formation
 
@@ -79,7 +83,6 @@ end
 to node-setup
   ask nodes [
     set color ((random number-of-colors) * 10 + 5)
-    set label word "my color is " color
     set label-color 0
     set size 2
 
@@ -96,7 +99,7 @@ to node-setup
 end
 
 to layout
-  layout-circle (sort nodes) max-pxcor - 1
+  layout-circle (sort nodes) max-pxcor - 3
 end
 
 to go
@@ -131,15 +134,38 @@ to go
 
   ask nodes with [is-adversarial = 0][ ;; maybe put this on the outside of the switch statements
     majority-vote-choose-color self  ;; this is where I am going to have a big switch statement to pick different strategies
-    set label word "Coop color is " color
+    set label word "Coop:" color
   ]
 
   ask nodes with [is-adversarial = 1][
     majority-vote-choose-color self  ;; this is where I am going to have a big switch statement to pick different strategies
-    set label word "Adver color is " color
+    set label word "Adver:" color
   ]
 
+
   tick
+
+  ;; stopping conditions
+  set coop-prop (count nodes with [is-adversarial = 0]) / (number-of-nodes)
+  set curr-prog (count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes)]) / number-of-nodes
+
+  if (curr-prog != coop-prop) [
+    set last-mismatch-time ticks
+    show curr-prog
+    show coop-prop
+  ]
+
+  ifelse (last-mismatch-time < (ticks - 10)) [ ;; if you are all the same color for 10 ticks, you did it.
+    show word "colors converged! after " ticks
+    stop
+    ] [
+    if (ticks > 1000) [ ;; you took too long
+      show "colors did not converge"
+      stop
+    ]
+
+    ]
+
 end
 
 
@@ -355,11 +381,11 @@ end
 GRAPHICS-WINDOW
 444
 10
-881
-448
+938
+505
 -1
 -1
-13.0
+6.0
 1
 10
 1
@@ -369,10 +395,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--16
-16
--16
-16
+-40
+40
+-40
+40
 1
 1
 1
@@ -403,7 +429,7 @@ number-of-adversarial
 number-of-adversarial
 0
 25
-10.0
+5.0
 1
 1
 NIL
@@ -492,7 +518,7 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot (count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes)]) / number-of-nodes "
-"coop-proportion" 1.0 0 -14835848 true " " "plot (count nodes with [is-adversarial = 0]) / (number-of-nodes) "
+"coop-proportion" 1.0 0 -14835848 true "" "plot (count nodes with [is-adversarial = 0]) / (number-of-nodes) \n"
 
 MONITOR
 907
@@ -513,7 +539,7 @@ CHOOSER
 initial-network-structure
 initial-network-structure
 "disconnected" "preferential" "small-world" "regular" "random"
-2
+1
 
 SLIDER
 5
@@ -585,7 +611,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-1
+0
 
 CHOOSER
 192
@@ -646,7 +672,7 @@ color-mismatch-tolerance
 color-mismatch-tolerance
 0
 1
-0.71
+0.39
 0.01
 1
 NIL
