@@ -1,10 +1,10 @@
 ;;@author: Matt Nicholson
 
-;; In this file, I am trying to make a model of a dynamic network. On this dynamic network, a color coordination task will happen. This will either be the color matching game.
+;; In this file, I am trying to make a model of a dynamic network. On this dynamic network, a color coordination task will happen. This will be the color matching game.
 ;; I think there should be one type of object, a node.
 
 ;; Right now each node changes in sequence, so the nodes at the end see
-;; at some point need to think about how links can form
+;; at some point need to think about how links can form ; make it consent based
 
 
 extensions [
@@ -20,14 +20,22 @@ nodes-own [
   is-adversarial  ;; a int indication of whether or not a node is adversarial
 
   ; reputation information
-  history-dict ;; a table of (other nodes, number-of-times-colors-matched)
+  history-dict ;; a table of (other nodes, proportion-of-mismatch mismatch-count total-count)
+
+  ; social information
+  neighbor-counts ; like that one paper that showed people a picture of the network
 
   ; should I have somethng here to make them update once per time step? like right now it is kind of acting continuously because the later updates can see the first updates in the round
-  last-time-color-changed
+  last-time-color-changed ; to make a limit on how frequently one can change your color. Corresponds to posting limits (as it is on reddit)
 
-  last-time-links-changed
+  last-time-links-changed ; to make a limit on how dynamic the network is. Corresponds to friend request freeze (find some justification for this)
 
-  ; should links be directed?
+  ; should links be directed? no, but I'm going to add two-way consent to form a link
+  who-i-will-link-with ; I think just a list for now a table of (other-nodes, next-I-will link with them). remove when they violate some conditions, like if the the proportion of color-mismatches exceeds the threshold
+
+
+  ; should also come up with something for severing ties
+
 
 ]
 
@@ -78,12 +86,15 @@ to node-setup
     ;; maybe put an if statement here
     set history-dict table:make
 
-    init-table self history-dict [0 0 0] ;; initialize table so each has a key for every other node and [prop mess-up-count total-count]
+    init-table self history-dict [0 0 0] ;; initialize table so each has a key for every other node and [prop color-mismatch-count total-count]
     ;; show history-dict
+
+    set who-i-will-link-with table:keys history-dict ; to start, you will link to whoever
+    ; set who-i-will-link-with table:make ;reconsider this maybe, but for now its just a list
+    ; init-table self who-i-will-link-with 0
   ]
 end
 
-;;circle layout
 to layout
   layout-circle (sort nodes) max-pxcor - 1
 end
@@ -144,23 +155,24 @@ to update-reputational-information [a-node]
     let ids-to-increment [who] of link-neighbors
 
     foreach ids-to-increment [ x ->
-      let history-list table:get history-dict x ; history-list is [prop messups total-count]
+      let history-list table:get history-dict x ; history-list is [prop color-mismatch total-count]
 
-      let old-disagree-count item 1 history-list
+      let old-mismatch-count item 1 history-list
       let old-total-count item 2 history-list
-      let new-disagree-count old-disagree-count
+      let new-mismatch-count old-mismatch-count
 
       if [color] of (node x) != my-color [
-        set new-disagree-count old-disagree-count + 1
+        set new-mismatch-count old-mismatch-count + 1
       ]
 
       let new-total-count old-total-count + 1
 
-      let proportion-of-disagrees new-disagree-count / new-total-count
+      let proportion-of-mismatch new-mismatch-count / new-total-count
 
-      table:put history-dict x (list proportion-of-disagrees new-disagree-count new-total-count)
+      table:put history-dict x (list proportion-of-mismatch new-mismatch-count new-total-count)
     ]
 
+    set who-i-will-link-with get-below-threshold-from-table history-dict color-mismatch-tolerance
     ;; show history-dict
   ]
 
@@ -174,7 +186,10 @@ to connect-randomly
 
   ask node from-node [
     if (to-node != from-node and not (link-neighbor? node to-node) and (count link-neighbors <= max-links)) [
-      create-link-with node to-node
+
+      if ((member? from-node [who-i-will-link-with] of (node to-node)) and (member? to-node who-i-will-link-with )) [ ;; only actually make the link if they both want it
+        create-link-with node to-node
+      ]
     ]
   ]
 end
@@ -198,12 +213,12 @@ to disconnect-randomly
   remove-links-between (node (random number-of-nodes)) (node (random number-of-nodes))
 end
 
-to majority-vote-choose-color [a_node]
+to majority-vote-choose-color [a-node]
 
-  let best-color [color] of a_node
-  let worst-color [color] of a_node
+  let best-color [color] of a-node
+  let worst-color [color] of a-node
 
-  ask a_node [
+  ask a-node [
     update-reputational-information self
     let node-neighbor-colors [color] of link-neighbors
 
@@ -225,8 +240,6 @@ to majority-vote-choose-color [a_node]
   ]
 
 end
-
-
 
 
 ;;;;;;;;;;;;;;;;;; END OF HELPER FUNCTIONS and START OF UTILS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -278,6 +291,7 @@ to remove-links-between [ a b ]
    ask a [ ask my-links with [ other-end = b ] [ die ] ]
 end
 
+
 to init-table [a-node a-table init-val]
   ;; initializes the history dict with all the other nodes as a key and 0 for the value
   ;; show a-node
@@ -300,7 +314,10 @@ to-report get-top-n-from-table [table n]
   let top-keys (list )
 
   foreach table:keys table [key ->
-    let this-number table:get table key
+    let this-number first table:get table key
+
+    ; show "this number"
+    ; show this-numbernode
 
     if (member? this-number top-n-values) and (not member? key top-keys) [
 
@@ -309,6 +326,29 @@ to-report get-top-n-from-table [table n]
   ]
 
   report top-keys
+
+end
+
+
+to-report get-below-threshold-from-table [table thresh]
+  ; returns a list of keys of the dictionary where values are less than the threshold
+
+  let below-keys (list )
+
+  foreach table:keys table [key ->
+    let this-number first table:get table key
+    let ticks-connected last table:get table key
+
+    let connect-time 10 ;; you have to be connected for 10 ticks to get blacklisted
+
+    if (this-number < thresh or ticks-connected < connect-time) [ ;; if you have messed me up less than the allowable theshold or we haven't connected that much, you can still connectS
+      set below-keys fput key below-keys
+    ]
+
+  ]
+
+  report below-keys
+
 
 end
 @#$#@#$#@
@@ -348,7 +388,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-43.0
+100.0
 1
 1
 NIL
@@ -363,7 +403,7 @@ number-of-adversarial
 number-of-adversarial
 0
 25
-25.0
+10.0
 1
 1
 NIL
@@ -508,7 +548,7 @@ SWITCH
 154
 enforce-max-links
 enforce-max-links
-0
+1
 1
 -1000
 
@@ -545,7 +585,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-0
+1
 
 CHOOSER
 192
@@ -596,6 +636,21 @@ Setup params
 11
 0.0
 1
+
+SLIDER
+216
+333
+409
+366
+color-mismatch-tolerance
+color-mismatch-tolerance
+0
+1
+0.71
+0.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
