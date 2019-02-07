@@ -6,7 +6,7 @@
 ;; Right now each node changes in sequence, so the nodes at the end see
 
 
-; new strategy: blend in and blend in proportion
+;; intelligently assign who is adversarial, betweenness, closeness, etc.
 
 
 extensions [
@@ -104,13 +104,13 @@ to layout
   ;; layout-circle (sort nodes) max-pxcor - 3
 
   ;; layout-radial nodes links (node 0)
-  repeat 30 [ layout-spring nodes links 0.5 15 10]
+  repeat 30 [ layout-spring nodes links 0.5 15 10] ;; this one is the most fun for the image
 end
 
 to go
 
   if (not is-network-fixed)[
-    ifelse (connection-strategy = "random") [ ;; maybe have one for adversaries and cooperators??
+    ifelse (connection-strategy = "random") [
       ask nodes with [is-adversarial = 0][ ;; maybe put this on the outside of the switch statements
         connect-randomly ;; this is where I am going to have a big switch statement to pick different strategies
         disconnect-randomly
@@ -133,7 +133,7 @@ to go
           disconnect-randomly
         ]
 
-      ]
+      ] ;; end if connection-strategy = "reputation"
     ]
   ]
 
@@ -165,7 +165,7 @@ to go
 
   ;; stopping conditions
   set coop-prop (count nodes with [is-adversarial = 0]) / (number-of-nodes)
-  set curr-prog (count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes)]) / number-of-nodes
+  set curr-prog (count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes with [is-adversarial = 0])]) / number-of-nodes
 
   if (curr-prog != coop-prop) [
     set last-mismatch-time ticks
@@ -225,11 +225,18 @@ end
 
 ;; writing these function to be intelligent is the hard part
 to connect-randomly
+   ;; show "connect-randomly is called"
+
   ;; change who they are connected to randomly
   let from-node (random number-of-nodes)
   let to-node (random number-of-nodes)
 
+
+
   ask node from-node [
+
+    ;; show "asking from node who they will link with"
+    ;; show who-i-will-link-with
     if (to-node != from-node and not (link-neighbor? node to-node) and (count link-neighbors <= max-links)) [
 
       if ((member? from-node [who-i-will-link-with] of (node to-node)) and (member? to-node who-i-will-link-with )) [ ;; only actually make the link if they both want it
@@ -291,14 +298,8 @@ end
 
 to link-formation
   if initial-network-structure = "disconnected"[
-    show "nothing happens here, but it isnt a return so I'm printing"
-    create-nodes number-of-adversarial [
-      set shape "square" ;; squares are adversarial
-      set is-adversarial true
-    ]
-    create-nodes number-of-nodes - number-of-adversarial [
-      set is-adversarial false
-    ]
+    nw:generate-random nodes links number-of-nodes 0
+    change-node-to-adversarial number-of-adversarial
   ]
 
   if initial-network-structure = "random" [
@@ -386,7 +387,7 @@ to-report get-below-threshold-from-table [table thresh]
 
     let connect-time 10 ;; you have to be connected for 10 ticks to get blacklisted
 
-    if (this-number < thresh or ticks-connected < connect-time) [ ;; if you have messed me up less than the allowable theshold or we haven't connected that much, you can still connectS
+    if (this-number < thresh or ticks-connected < connect-time) [ ;; if you have messed me up less than the allowable theshold or we haven't connected that much, you can still connect
       set below-keys fput key below-keys
     ]
 
@@ -433,7 +434,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-43.0
+100.0
 1
 1
 NIL
@@ -448,17 +449,17 @@ number-of-adversarial
 number-of-adversarial
 0
 25
-13.0
+25.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-888
-12
-951
-45
+952
+13
+1015
+46
 NIL
 setup
 NIL
@@ -472,10 +473,10 @@ NIL
 1
 
 BUTTON
-1030
-12
-1093
-45
+1095
+13
+1158
+46
 NIL
 go
 T
@@ -489,10 +490,10 @@ NIL
 1
 
 BUTTON
-954
-12
-1029
-45
+1019
+13
+1094
+46
 go once
 go
 NIL
@@ -521,10 +522,10 @@ NIL
 HORIZONTAL
 
 PLOT
-908
-106
-1372
-365
+968
+104
+1432
+363
 Proportion of matched colors
 NIL
 NIL
@@ -536,14 +537,14 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot (count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes)]) / number-of-nodes "
+"default" 1.0 0 -16777216 true "" "plot (count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes with [is-adversarial = 0])]) / number-of-nodes "
 "coop-proportion" 1.0 0 -14835848 true "" "plot (count nodes with [is-adversarial = 0]) / (number-of-nodes) \n"
 
 MONITOR
-907
-57
-978
-102
+972
+58
+1043
+103
 NIL
 count links
 17
@@ -558,7 +559,7 @@ CHOOSER
 initial-network-structure
 initial-network-structure
 "disconnected" "preferential" "small-world" "regular" "random"
-4
+3
 
 SLIDER
 5
@@ -569,7 +570,7 @@ number-of-links
 number-of-links
 0
 20
-2.0
+9.0
 1
 1
 NIL
@@ -630,7 +631,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-1
+0
 
 CHOOSER
 192
@@ -691,7 +692,7 @@ color-mismatch-tolerance
 color-mismatch-tolerance
 0
 1
-0.39
+0.76
 0.01
 1
 NIL
@@ -706,7 +707,7 @@ adversary-act-bad-proportion
 adversary-act-bad-proportion
 0
 1
-1.0
+0.72
 0.01
 1
 NIL
