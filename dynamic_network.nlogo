@@ -4,7 +4,9 @@
 ;; I think there should be one type of object, a node.
 
 ;; Right now each node changes in sequence, so the nodes at the end see
-;; at some point need to think about how links can form ; make it consent based
+
+
+; new strategy: blend in and blend in proportion
 
 
 extensions [
@@ -99,7 +101,10 @@ to node-setup
 end
 
 to layout
-  layout-circle (sort nodes) max-pxcor - 3
+  ;; layout-circle (sort nodes) max-pxcor - 3
+
+  ;; layout-radial nodes links (node 0)
+  repeat 30 [ layout-spring nodes links 0.5 15 10]
 end
 
 to go
@@ -133,17 +138,30 @@ to go
   ]
 
   ask nodes with [is-adversarial = 0][ ;; maybe put this on the outside of the switch statements
-    majority-vote-choose-color self  ;; this is where I am going to have a big switch statement to pick different strategies
+    majority-vote-choose-color self 0  ;; this is where I am going to have a big switch statement to pick different strategies
     set label word "Coop:" color
   ]
 
   ask nodes with [is-adversarial = 1][
-    majority-vote-choose-color self  ;; this is where I am going to have a big switch statement to pick different strategies
-    set label word "Adver:" color
+    if (adversary-color-change-strategy = "blend in") [ ; sometimes act normal, but other times act adversarially, at proportion 1, this is just anti majority vote
+
+      ifelse ((random-float 1) < adversary-act-bad-proportion)[ ; you are going to act badly
+
+        majority-vote-choose-color self 1
+
+      ] [ ;; try to blend in
+        majority-vote-choose-color self 0
+      ]
+
+    ]
+
+      set label word "Adver:" color
+
   ]
 
 
   tick
+  layout
 
   ;; stopping conditions
   set coop-prop (count nodes with [is-adversarial = 0]) / (number-of-nodes)
@@ -155,7 +173,8 @@ to go
     show coop-prop
   ]
 
-  ifelse (last-mismatch-time < (ticks - 10)) [ ;; if you are all the same color for 10 ticks, you did it.
+  ;; CONSIDER CHANGING THE TICKS IN THE ROW
+  ifelse (last-mismatch-time < (ticks - 5)) [ ;; if you are all the same color for 10 ticks, you did it.
     show word "colors converged! after " ticks
     stop
     ] [
@@ -239,7 +258,7 @@ to disconnect-randomly
   remove-links-between (node (random number-of-nodes)) (node (random number-of-nodes))
 end
 
-to majority-vote-choose-color [a-node]
+to majority-vote-choose-color [a-node actually-act-adversarially]
 
   let best-color [color] of a-node
   let worst-color [color] of a-node
@@ -257,7 +276,7 @@ to majority-vote-choose-color [a-node]
       ;show word "worst color " worst-color
       ;show is-adversarial
 
-      ifelse (is-adversarial = 1) [
+      ifelse (is-adversarial = 1 and actually-act-adversarially = 1) [ ;; another flag just it case you wanna blend in
         set color worst-color
       ] [ ;; this is the else block
         set color best-color
@@ -414,7 +433,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-100.0
+43.0
 1
 1
 NIL
@@ -429,7 +448,7 @@ number-of-adversarial
 number-of-adversarial
 0
 25
-5.0
+13.0
 1
 1
 NIL
@@ -539,7 +558,7 @@ CHOOSER
 initial-network-structure
 initial-network-structure
 "disconnected" "preferential" "small-world" "regular" "random"
-1
+4
 
 SLIDER
 5
@@ -550,7 +569,7 @@ number-of-links
 number-of-links
 0
 20
-4.0
+2.0
 1
 1
 NIL
@@ -611,7 +630,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-0
+1
 
 CHOOSER
 192
@@ -630,7 +649,7 @@ CHOOSER
 325
 adversary-color-change-strategy
 adversary-color-change-strategy
-"anti majority vote"
+"blend in"
 0
 
 TEXTBOX
@@ -673,6 +692,21 @@ color-mismatch-tolerance
 0
 1
 0.39
+0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+215
+371
+435
+404
+adversary-act-bad-proportion
+adversary-act-bad-proportion
+0
+1
+1.0
 0.01
 1
 NIL
