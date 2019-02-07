@@ -7,6 +7,13 @@
 
 
 ;; intelligently assign who is adversarial, betweenness, closeness, etc.
+;; tolerance over time
+;; network not changing
+;; limit number of times color can change
+;; forgiveness in memory
+;; everyone has to be connected to win
+;; ban certain people at halfway
+;; come up with metrics to report at the end
 
 
 extensions [
@@ -104,7 +111,7 @@ to layout
   ;; layout-circle (sort nodes) max-pxcor - 3
 
   ;; layout-radial nodes links (node 0)
-  repeat 30 [ layout-spring nodes links 0.5 15 10] ;; this one is the most fun for the image
+  repeat 30 [ layout-spring nodes links 0.5 12 10] ;; this one is the most fun for the image
 end
 
 to go
@@ -449,7 +456,7 @@ number-of-adversarial
 number-of-adversarial
 0
 25
-25.0
+5.0
 1
 1
 NIL
@@ -559,7 +566,7 @@ CHOOSER
 initial-network-structure
 initial-network-structure
 "disconnected" "preferential" "small-world" "regular" "random"
-3
+2
 
 SLIDER
 5
@@ -570,7 +577,7 @@ number-of-links
 number-of-links
 0
 20
-9.0
+2.0
 1
 1
 NIL
@@ -594,7 +601,7 @@ SWITCH
 154
 enforce-max-links
 enforce-max-links
-1
+0
 1
 -1000
 
@@ -607,7 +614,7 @@ max-links
 max-links
 1
 number-of-nodes
-3.0
+2.0
 1
 1
 NIL
@@ -631,7 +638,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-0
+1
 
 CHOOSER
 192
@@ -692,7 +699,7 @@ color-mismatch-tolerance
 color-mismatch-tolerance
 0
 1
-0.76
+0.6
 0.01
 1
 NIL
@@ -707,7 +714,7 @@ adversary-act-bad-proportion
 adversary-act-bad-proportion
 0
 1
-0.72
+1.0
 0.01
 1
 NIL
