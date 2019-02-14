@@ -7,13 +7,13 @@
 
 
 ;; intelligently assign who is adversarial, betweenness, closeness, etc.
-;; tolerance over time
+;; tolerance varying over time, forgiveness in memory
 ;; network not changing
 ;; limit number of times color can change
-;; forgiveness in memory
 ;; everyone has to be connected to win
 ;; ban certain people at halfway
 ;; come up with metrics to report at the end
+;; disengaged strategy
 
 
 extensions [
@@ -55,6 +55,8 @@ globals [
  coop-prop
  curr-prog
  last-mismatch-time
+
+ no-op  ;; a variable for when I want to do nothing
 ]
 
 
@@ -111,7 +113,7 @@ to layout
   ;; layout-circle (sort nodes) max-pxcor - 3
 
   ;; layout-radial nodes links (node 0)
-  repeat 30 [ layout-spring nodes links 0.5 12 10] ;; this one is the most fun for the image
+   repeat 30 [ layout-spring nodes links 0.5 12 10] ;; this one is the most fun for the image
 end
 
 to go
@@ -150,7 +152,7 @@ to go
   ]
 
   ask nodes with [is-adversarial = 1][
-    if (adversary-color-change-strategy = "blend in") [ ; sometimes act normal, but other times act adversarially, at proportion 1, this is just anti majority vote
+    ifelse (adversary-color-change-strategy = "blend in") [ ; sometimes act normal, but other times act adversarially, at proportion 1, this is just anti majority vote
 
       ifelse ((random-float 1) < adversary-act-bad-proportion)[ ; you are going to act badly
 
@@ -159,6 +161,15 @@ to go
       ] [ ;; try to blend in
         majority-vote-choose-color self 0
       ]
+
+    ] ;; end if (adversary-color-change-strategy = "blend in")
+    [
+      if (adversary-color-change-strategy = "disengaged")[
+        ;; do nothing
+        set no-op 0 ;; I don't think I can just pass, so just do something dumb
+      ]
+
+
 
     ]
 
@@ -441,7 +452,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-100.0
+28.0
 1
 1
 NIL
@@ -456,7 +467,7 @@ number-of-adversarial
 number-of-adversarial
 0
 25
-5.0
+21.0
 1
 1
 NIL
@@ -638,7 +649,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-1
+0
 
 CHOOSER
 192
@@ -657,8 +668,8 @@ CHOOSER
 325
 adversary-color-change-strategy
 adversary-color-change-strategy
-"blend in"
-0
+"blend in" "disengaged"
+1
 
 TEXTBOX
 262
@@ -699,7 +710,7 @@ color-mismatch-tolerance
 color-mismatch-tolerance
 0
 1
-0.6
+0.87
 0.01
 1
 NIL
@@ -714,7 +725,7 @@ adversary-act-bad-proportion
 adversary-act-bad-proportion
 0
 1
-1.0
+0.87
 0.01
 1
 NIL
