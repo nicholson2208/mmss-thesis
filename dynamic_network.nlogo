@@ -13,7 +13,6 @@
 ;; everyone has to be connected to win
 ;; ban certain people at halfway
 ;; come up with metrics to report at the end
-;; disengaged strategy
 
 
 extensions [
@@ -194,14 +193,24 @@ to go
   ;; CONSIDER CHANGING THE TICKS IN THE ROW
   ifelse (last-mismatch-time < (ticks - 5)) [ ;; if you are all the same color for 10 ticks, you did it.
     show word "colors converged! after " ticks
+    if (write-final-network-to-file)[
+      write-network-to-file word "networks/" (word output-file-name ".xml" )
+    ]
     stop
+
     ] [
     if (ticks > 1000) [ ;; you took too long
       show "colors did not converge"
+      if (write-final-network-to-file)[
+        write-network-to-file word "networks/" (word output-file-name ".xml" )
+      ]
       stop
     ]
 
     ]
+
+
+
 
 end
 
@@ -336,7 +345,7 @@ to link-formation
 
   if initial-network-structure = "preferential"[
     ;; still need to change link-breed to direct, should I?? I think maybe no
-    nw:generate-preferential-attachment nodes links number-of-nodes
+    nw:generate-preferential-attachment nodes links number-of-nodes 1 ;; make min degree 1
     change-node-to-adversarial number-of-adversarial
   ]
 
@@ -413,6 +422,10 @@ to-report get-below-threshold-from-table [table thresh]
 
   report below-keys
 
+end
+
+to write-network-to-file [file_name]
+  nw:save-graphml  file_name  ;; figure out whether this is the format I want, graphml seems like overkill
 
 end
 @#$#@#$#@
@@ -452,7 +465,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-28.0
+60.0
 1
 1
 NIL
@@ -467,7 +480,7 @@ number-of-adversarial
 number-of-adversarial
 0
 25
-21.0
+8.0
 1
 1
 NIL
@@ -533,7 +546,7 @@ number-of-colors
 number-of-colors
 1
 13
-13.0
+4.0
 1
 1
 NIL
@@ -710,7 +723,7 @@ color-mismatch-tolerance
 color-mismatch-tolerance
 0
 1
-0.87
+0.0
 0.01
 1
 NIL
@@ -725,11 +738,33 @@ adversary-act-bad-proportion
 adversary-act-bad-proportion
 0
 1
-0.87
+0.0
 0.01
 1
 NIL
 HORIZONTAL
+
+SWITCH
+8
+498
+205
+531
+write-final-network-to-file
+write-final-network-to-file
+0
+1
+-1000
+
+INPUTBOX
+8
+437
+327
+497
+output-file-name
+run1
+1
+0
+String
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1073,7 +1108,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0.2
+NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
