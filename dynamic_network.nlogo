@@ -15,6 +15,11 @@
 ;; come up with metrics to report at the end
 
 
+;; weighted majority vote based on reputation and based on degree centrality
+;; Local information, on degree centrality, or "wealth"
+;; cooperators should be a connected component
+
+
 extensions [
   ;csv
   table
@@ -112,7 +117,7 @@ to layout
   ;; layout-circle (sort nodes) max-pxcor - 3
 
   ;; layout-radial nodes links (node 0)
-   repeat 30 [ layout-spring nodes links 0.5 12 10] ;; this one is the most fun for the image
+   repeat 30 [ layout-spring nodes links 0.5 10 10] ;; this one is the most fun for the image
 end
 
 to go
@@ -352,12 +357,39 @@ to link-formation
 end
 
 to change-node-to-adversarial [n]
-  ask n-of n nodes [
+  ; sort by degree and then select the
+  let degree-order reverse sort-on [ count my-links ] max-n-of number-of-nodes nodes [ count my-links ]
+
+  ;; show degree-order
+
+  let start-index 0  ;; initialize the indices
+  let end-index number-of-nodes - 1
+
+  ifelse(adversarial-placement = "high")[
+   set end-index start-index + number-of-adversarial
+
+
+  ] [ ;; the else block of the "high" part
+    ifelse(adversarial-placement = "low") [
+      set start-index end-index - number-of-adversarial
+
+    ] [ ;; the else block of the "low"
+
+      set start-index int(number-of-nodes / 2) - int(number-of-adversarial / 2)
+      set end-index int(number-of-adversarial / 2) + int(number-of-nodes / 2)
+
+    ]
+  ]
+
+  foreach sublist degree-order start-index end-index  [ a-node ->
+
+    ask a-node[
     set shape "square" ;; squares are adversarial
     set is-adversarial 1
     set size 2
-
     ]
+  ]
+
 end
 
 to remove-links-between [ a b ]
@@ -465,7 +497,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-60.0
+36.0
 1
 1
 NIL
@@ -479,8 +511,8 @@ SLIDER
 number-of-adversarial
 number-of-adversarial
 0
-25
-8.0
+50
+3.0
 1
 1
 NIL
@@ -546,7 +578,7 @@ number-of-colors
 number-of-colors
 1
 13
-4.0
+13.0
 1
 1
 NIL
@@ -590,7 +622,7 @@ CHOOSER
 initial-network-structure
 initial-network-structure
 "disconnected" "preferential" "small-world" "regular" "random"
-2
+1
 
 SLIDER
 5
@@ -625,7 +657,7 @@ SWITCH
 154
 enforce-max-links
 enforce-max-links
-0
+1
 1
 -1000
 
@@ -648,7 +680,7 @@ TEXTBOX
 206
 10
 403
-68
+40
 In-game Params
 24
 0.0
@@ -662,7 +694,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-0
+1
 
 CHOOSER
 192
@@ -682,7 +714,7 @@ CHOOSER
 adversary-color-change-strategy
 adversary-color-change-strategy
 "blend in" "disengaged"
-1
+0
 
 TEXTBOX
 262
@@ -723,7 +755,7 @@ color-mismatch-tolerance
 color-mismatch-tolerance
 0
 1
-0.0
+0.3
 0.01
 1
 NIL
@@ -738,7 +770,7 @@ adversary-act-bad-proportion
 adversary-act-bad-proportion
 0
 1
-0.0
+0.92
 0.01
 1
 NIL
@@ -765,6 +797,16 @@ run1
 1
 0
 String
+
+CHOOSER
+13
+239
+160
+284
+adversarial-placement
+adversarial-placement
+"high" "medium" "low"
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
