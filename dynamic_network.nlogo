@@ -346,6 +346,8 @@ to social-majority-vote-choose-color [a-node]
 
   ask a-node [
     let best-color color
+    table:put neighbor-colors color ([count link-neighbors] of myself)
+
     ask link-neighbors [
 ;;show myself
       let neighbor-color ([color] of (node who))
@@ -634,7 +636,7 @@ number-of-colors
 number-of-colors
 1
 13
-13.0
+10.0
 1
 1
 NIL
@@ -702,7 +704,7 @@ SWITCH
 81
 is-network-fixed
 is-network-fixed
-0
+1
 1
 -1000
 
@@ -750,7 +752,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-1
+0
 
 CHOOSER
 192
