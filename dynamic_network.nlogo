@@ -210,26 +210,23 @@ to go
   ]
 
   ;; CONSIDER CHANGING THE TICKS IN THE ROW
-  ifelse (last-mismatch-time < (ticks - 5)) [ ;; if you are all the same color for 10 ticks, you did it.
-    show word "colors converged! after " ticks
-    if (write-final-network-to-file)[
-      write-network-to-file word "networks/" (word output-file-name ".xml" )
+  ifelse (last-mismatch-time < (ticks - 5)) [ ;; if you are all the same color for 10 ticks, you did almost did it
+    if (check-if-cooperators-form-connected-component) [
+      show word "colors converged! after " ticks
+      if (write-final-network-to-file)[
+        write-network-to-file word "networks/" (word output-file-name ".xml" )
+      ]
+      stop
     ]
-    stop
-
-    ] [
-    if (ticks > 1000) [ ;; you took too long
+  ] [
+    if (ticks > 500) [ ;; you took too long
       show "colors did not converge"
       if (write-final-network-to-file)[
         write-network-to-file word "networks/" (word output-file-name ".xml" )
       ]
       stop
     ]
-
-    ]
-
-
-
+  ]
 
 end
 
@@ -375,15 +372,29 @@ to social-majority-vote-choose-color [a-node]
     ]
 
     set color best-color
-    ;;show neighbor-colors
+
   ]
-
-
 
 end
 
 
 ;;;;;;;;;;;;;;;;;; END OF HELPER FUNCTIONS and START OF UTILS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to-report check-if-cooperators-form-connected-component
+  let connected-comps nw:weak-component-clusters
+
+  show connected-comps
+
+  foreach connected-comps[ a-comp ->
+    if(count a-comp with [is-adversarial = 0] = number-of-nodes - number-of-adversarial) [
+      report true
+    ]
+  ]
+
+  report false
+
+end
+
 
 to link-formation
   if initial-network-structure = "disconnected"[
@@ -570,7 +581,7 @@ number-of-adversarial
 number-of-adversarial
 0
 50
-3.0
+26.0
 1
 1
 NIL
@@ -680,7 +691,7 @@ CHOOSER
 initial-network-structure
 initial-network-structure
 "disconnected" "preferential" "small-world" "regular" "random"
-1
+2
 
 SLIDER
 5
@@ -752,7 +763,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-0
+1
 
 CHOOSER
 192
@@ -813,7 +824,7 @@ color-mismatch-tolerance
 color-mismatch-tolerance
 0
 1
-0.3
+0.78
 0.01
 1
 NIL
@@ -828,7 +839,7 @@ adversary-act-bad-proportion
 adversary-act-bad-proportion
 0
 1
-0.92
+0.39
 0.01
 1
 NIL
@@ -864,7 +875,7 @@ CHOOSER
 adversarial-placement
 adversarial-placement
 "high" "medium" "low"
-1
+2
 
 @#$#@#$#@
 ## WHAT IS IT?
