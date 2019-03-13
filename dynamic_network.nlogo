@@ -44,11 +44,10 @@ nodes-own [
   last-time-links-changed ; to make a limit on how dynamic the network is. Corresponds to friend request freeze (find some justification for this)
 
   ; should links be directed? no, but I'm going to add two-way consent to form a link
-  who-i-will-link-with ; I think just a list for now a table of (other-nodes, next-I-will link with them). remove when they violate some conditions, like if the the proportion of color-mismatches exceeds the threshold
-
+  who-i-will-link-with ; I think just a list for now a table of (other-nodes, next-I-will link with them). remove when they violate some conditions,
+                       ; like if the the proportion of color-mismatches exceeds the threshold
 
   ; should also come up with something for severing ties
-
 
 ]
 
@@ -88,9 +87,7 @@ to setup
     set color-loop-counter color-loop-counter + 1
   ]
 
-
   layout ;; make it at least look pretty
-
 
 end
 
@@ -151,7 +148,24 @@ to go
   ]
 
   ask nodes with [is-adversarial = 0][ ;; maybe put this on the outside of the switch statements
-    majority-vote-choose-color self 0  ;; this is where I am going to have a big switch statement to pick different strategies
+    ifelse (cooperator-color-change-strategy = "naive-majority-vote") [
+      majority-vote-choose-color self 0  ;; this is where I am going to have a big switch statement to pick different strategies
+    ] ;; else of the majority-vote
+    [
+      ifelse (cooperator-color-change-strategy = "reputation-majority-vote" ) [
+        show "" ;; placeholder
+
+      ]
+      [
+        if (cooperator-color-change-strategy = "social-majority-vote" ) [
+          social-majority-vote-choose-color self
+        ]
+
+      ]
+
+
+    ]
+
     set label word "Coop:" color
   ]
 
@@ -311,10 +325,6 @@ to majority-vote-choose-color [a-node actually-act-adversarially]
       set best-color item 0 (modes node-neighbor-colors)
       set worst-color one-of possible-colors;(best-color + 10) mod (number-of-colors * 10 + 5)
 
-      ;show word "best color " best-color
-      ;show word "worst color " worst-color
-      ;show is-adversarial
-
       ifelse (is-adversarial = 1 and actually-act-adversarially = 1) [ ;; another flag just it case you wanna blend in
         set color worst-color
       ] [ ;; this is the else block
@@ -322,6 +332,51 @@ to majority-vote-choose-color [a-node actually-act-adversarially]
       ]
     ]
   ]
+
+end
+
+
+to social-majority-vote-choose-color [a-node]
+  let neighbor-colors table:make
+
+
+  ;; let matched
+
+  ; need to get the most color
+
+  ask a-node [
+    let best-color color
+    ask link-neighbors [
+;;show myself
+      let neighbor-color ([color] of (node who))
+
+      ifelse (table:has-key? neighbor-colors neighbor-color) [
+        let old-count table:get neighbor-colors neighbor-color
+
+        table:put neighbor-colors neighbor-color ([count link-neighbors] of (node who)) + old-count
+
+
+      ] [
+
+        table:put neighbor-colors neighbor-color ([count link-neighbors] of (node who))
+      ]
+
+
+      let max-val 0
+
+      foreach table:keys neighbor-colors [ key ->
+        if(table:get neighbor-colors key > max-val) [
+          set max-val table:get neighbor-colors key
+          set best-color key
+        ]
+      ]
+    ]
+
+    set color best-color
+    ;;show neighbor-colors
+  ]
+
+
 
 end
 
@@ -456,6 +511,7 @@ to-report get-below-threshold-from-table [table thresh]
 
 end
 
+
 to write-network-to-file [file_name]
   nw:save-graphml  file_name  ;; figure out whether this is the format I want, graphml seems like overkill
 
@@ -497,7 +553,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-36.0
+100.0
 1
 1
 NIL
@@ -646,7 +702,7 @@ SWITCH
 81
 is-network-fixed
 is-network-fixed
-1
+0
 1
 -1000
 
@@ -703,8 +759,8 @@ CHOOSER
 277
 cooperator-color-change-strategy
 cooperator-color-change-strategy
-"majority vote"
-0
+"naive-majority-vote" "social-majority-vote" "reputation-majority-vote"
+1
 
 CHOOSER
 192
