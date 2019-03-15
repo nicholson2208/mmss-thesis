@@ -119,9 +119,14 @@ end
 
 to go
 
+  ask nodes with [is-adversarial = 0] [
+    update-reputational-information self ;; should refactor this
+  ]
+
   if (not is-network-fixed)[
     ifelse (connection-strategy = "random") [
       ask nodes with [is-adversarial = 0][ ;; maybe put this on the outside of the switch statements
+
         connect-randomly ;; this is where I am going to have a big switch statement to pick different strategies
         disconnect-randomly
       ]
@@ -134,6 +139,7 @@ to go
       ] [ ; the else block
       if (connection-strategy = "reputation") [
         ask nodes with [is-adversarial = 0][
+
           connect-randomly
           disconnect-using-reputation self
         ]
@@ -149,11 +155,11 @@ to go
 
   ask nodes with [is-adversarial = 0][ ;; maybe put this on the outside of the switch statements
     ifelse (cooperator-color-change-strategy = "naive-majority-vote") [
-      majority-vote-choose-color self 0  ;; this is where I am going to have a big switch statement to pick different strategies
+      majority-vote-choose-color self 0
     ] ;; else of the majority-vote
     [
       ifelse (cooperator-color-change-strategy = "reputation-majority-vote" ) [
-        show "" ;; placeholder
+        reputation-majority-vote-choose-color self
 
       ]
       [
@@ -210,7 +216,7 @@ to go
   ]
 
   ;; CONSIDER CHANGING THE TICKS IN THE ROW
-  ifelse (last-mismatch-time < (ticks - 5)) [ ;; if you are all the same color for 10 ticks, you did almost did it
+  ifelse (last-mismatch-time < (ticks - 5)) [ ;; if you are all the same color for 5 ticks, you did almost did it, FIGURE HOW TO DEFEND THIS, maybe like a momentum thing -- need it to settle
     if (check-if-cooperators-form-connected-component) [
       show word "colors converged! after " ticks
       if (write-final-network-to-file)[
@@ -261,6 +267,8 @@ to update-reputational-information [a-node]
     ]
 
     set who-i-will-link-with get-below-threshold-from-table history-dict color-mismatch-tolerance
+
+    ;; show "just finished updating reputation"
     ;; show history-dict
   ]
 
@@ -314,7 +322,7 @@ to majority-vote-choose-color [a-node actually-act-adversarially]
   let worst-color [color] of a-node
 
   ask a-node [
-    update-reputational-information self
+
     let node-neighbor-colors [color] of link-neighbors
 
     if (not empty? node-neighbor-colors)[
@@ -336,10 +344,6 @@ end
 to social-majority-vote-choose-color [a-node]
   let neighbor-colors table:make
 
-
-  ;; let matched
-
-  ; need to get the most color
 
   ask a-node [
     let best-color color
@@ -377,6 +381,58 @@ to social-majority-vote-choose-color [a-node]
 
 end
 
+
+to reputation-majority-vote-choose-color [a-node]
+  ;; this only makes sense if the strategy is reputation! SHOULD PUT SOME ERROR CHECKING IN.
+  ;; should also refactor into one general function, but that is low priority
+
+  let neighbor-colors table:make
+
+
+  ask a-node [
+    let best-color color
+    table:put neighbor-colors color 1 ;; you always agree with your own color
+
+    let my-history-dict history-dict
+    ;; show my-history-dict
+
+    ask link-neighbors [
+
+      let neighbor-color ([color] of (node who))
+
+
+      let proportion-matching 1 - item 0 table:get my-history-dict who ;; take the mismatch proportion and turn it into matched proportion
+      ;; show proportion-matching
+
+      ifelse (table:has-key? neighbor-colors neighbor-color) [
+        let old-count table:get neighbor-colors neighbor-color
+
+
+
+        table:put neighbor-colors neighbor-color proportion-matching + old-count
+
+
+      ] [
+
+        table:put neighbor-colors neighbor-color proportion-matching
+      ]
+
+
+      let max-val 0
+
+      foreach table:keys neighbor-colors [ key ->
+        if(table:get neighbor-colors key > max-val) [
+          set max-val table:get neighbor-colors key
+          set best-color key
+        ]
+      ]
+    ]
+
+    set color best-color
+
+  ]
+
+end
 
 ;;;;;;;;;;;;;;;;;; END OF HELPER FUNCTIONS and START OF UTILS ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -566,7 +622,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-100.0
+15.0
 1
 1
 NIL
@@ -581,7 +637,7 @@ number-of-adversarial
 number-of-adversarial
 0
 50
-26.0
+0.0
 1
 1
 NIL
@@ -691,7 +747,7 @@ CHOOSER
 initial-network-structure
 initial-network-structure
 "disconnected" "preferential" "small-world" "regular" "random"
-2
+4
 
 SLIDER
 5
@@ -773,7 +829,7 @@ CHOOSER
 cooperator-color-change-strategy
 cooperator-color-change-strategy
 "naive-majority-vote" "social-majority-vote" "reputation-majority-vote"
-1
+2
 
 CHOOSER
 192
@@ -839,7 +895,7 @@ adversary-act-bad-proportion
 adversary-act-bad-proportion
 0
 1
-0.39
+1.0
 0.01
 1
 NIL
@@ -852,7 +908,7 @@ SWITCH
 531
 write-final-network-to-file
 write-final-network-to-file
-0
+1
 1
 -1000
 
