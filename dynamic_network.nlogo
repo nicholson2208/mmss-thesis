@@ -1,23 +1,12 @@
 ;;@author: Matt Nicholson
 
-;; In this file, I am trying to make a model of a dynamic network. On this dynamic network, a color coordination task will happen. This will be the color matching game.
-;; I think there should be one type of object, a node.
-
-;; Right now each node changes in sequence, so the nodes at the end see
-
-
-;; intelligently assign who is adversarial, betweenness, closeness, etc.
 ;; tolerance varying over time, forgiveness in memory
 ;; network not changing
 ;; limit number of times color can change
-;; everyone has to be connected to win
 ;; ban certain people at halfway
 ;; come up with metrics to report at the end
 
 
-;; weighted majority vote based on reputation and based on degree centrality
-;; Local information, on degree centrality, or "wealth"
-;; cooperators should be a connected component
 
 
 extensions [
@@ -622,7 +611,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-15.0
+100.0
 1
 1
 NIL
@@ -637,7 +626,7 @@ number-of-adversarial
 number-of-adversarial
 0
 50
-0.0
+20.0
 1
 1
 NIL
@@ -747,7 +736,7 @@ CHOOSER
 initial-network-structure
 initial-network-structure
 "disconnected" "preferential" "small-world" "regular" "random"
-4
+2
 
 SLIDER
 5
@@ -819,7 +808,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-1
+0
 
 CHOOSER
 192
