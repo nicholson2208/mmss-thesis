@@ -467,6 +467,11 @@ to link-formation
     change-node-to-adversarial number-of-adversarial
   ]
 
+  if initial-network-structure = "from-file" [
+    nw:load-matrix (word "networks/initial_networks/" input-file-name  ".txt") nodes links
+    change-node-to-adversarial number-of-adversarial
+  ]
+
 end
 
 to change-node-to-adversarial [n]
@@ -735,8 +740,8 @@ CHOOSER
 198
 initial-network-structure
 initial-network-structure
-"disconnected" "preferential" "small-world" "regular" "random"
-2
+"disconnected" "preferential" "small-world" "regular" "random" "from-file"
+5
 
 SLIDER
 5
@@ -921,6 +926,17 @@ adversarial-placement
 adversarial-placement
 "high" "medium" "low"
 2
+
+INPUTBOX
+8
+371
+182
+431
+input-file-name
+NIL
+1
+0
+String
 
 @#$#@#$#@
 ## WHAT IS IT?
