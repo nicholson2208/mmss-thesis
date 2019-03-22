@@ -22,7 +22,11 @@ nodes-own [
   is-adversarial  ;; a int indication of whether or not a node is adversarial
 
   ; reputation information
-  history-dict ;; a table of (other nodes, proportion-of-mismatch mismatch-count total-count)
+
+  history-dict ;; a table of (other nodes, proportion-of-mismatch mismatch-count total-count list-of-last-ten)
+
+  last-n-actions ;; a table of (other nodes, last)
+
 
   ; social information
   neighbor-counts ; like that one paper that showed people a picture of the network
@@ -88,6 +92,11 @@ to node-setup
     set size 2
 
     ;; maybe put an if statement here
+
+    set last-n-actions table:make
+    init-table self last-n-actions n-values memory-duration [0]
+
+
     set history-dict table:make
 
     init-table self history-dict [0 0 0] ;; initialize table so each has a key for every other node and [prop color-mismatch-count total-count]
@@ -237,6 +246,7 @@ to update-reputational-information [a-node]
 
     let ids-to-increment [who] of link-neighbors
 
+    ;; this need to get refactored to pull from the last-n-actions dict and then from there the history dict can be populated
     foreach ids-to-increment [ x ->
       let history-list table:get history-dict x ; history-list is [prop color-mismatch total-count]
 
@@ -896,10 +906,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-8
-498
-205
-531
+2
+559
+199
+592
 write-final-network-to-file
 write-final-network-to-file
 1
@@ -907,10 +917,10 @@ write-final-network-to-file
 -1000
 
 INPUTBOX
-8
-437
-327
-497
+2
+498
+321
+558
 output-file-name
 run1
 1
@@ -925,18 +935,33 @@ CHOOSER
 adversarial-placement
 adversarial-placement
 "high" "medium" "low"
-2
+0
 
 INPUTBOX
-8
-371
-182
-431
+2
+432
+176
+492
 input-file-name
-NIL
+Lattice1
 1
 0
 String
+
+SLIDER
+229
+411
+401
+444
+memory-duration
+memory-duration
+1
+100
+10.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
