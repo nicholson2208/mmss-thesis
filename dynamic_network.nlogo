@@ -42,6 +42,7 @@ nodes-own [
 
   ; should also come up with something for severing ties
 
+
 ]
 
 directed-link-breed [edges edge]
@@ -99,8 +100,10 @@ to node-setup
 
     set history-dict table:make
 
-    init-table self history-dict [0 0 0] ;; initialize table so each has a key for every other node and [prop color-mismatch-count total-count]
-    ;; show history-dict
+    init-table self history-dict [0 [] []] ;; change this to [prop [ticks connected] [was matching at that tick?]], not [0 0 0]
+
+    ;; initialize table so each has a key for every other node and [prop color-mismatch-count total-count]
+    ;;show history-dict
 
     set who-i-will-link-with table:keys history-dict ; to start, you will link to whoever
     ; set who-i-will-link-with table:make ;reconsider this maybe, but for now its just a list
@@ -241,6 +244,9 @@ end
 to update-reputational-information [a-node]
   ; get all of the colors of the neighbors, if different, add one to my dictionary
 
+
+  ;; I THINK THAT THIS SHOULD BE A DICTIONARY OF list of list being [[ticks connected] [was matching at that tick?]]
+  ;; and then I can have a different function to calculate
   ask a-node [
     let my-color color
 
@@ -250,19 +256,35 @@ to update-reputational-information [a-node]
     foreach ids-to-increment [ x ->
       let history-list table:get history-dict x ; history-list is [prop color-mismatch total-count]
 
-      let old-mismatch-count item 1 history-list
-      let old-total-count item 2 history-list
-      let new-mismatch-count old-mismatch-count
 
-      if [color] of (node x) != my-color [
-        set new-mismatch-count old-mismatch-count + 1
+;      show "showing history list"
+;      show history-list
+
+      let times-connected item 1 history-list
+      let was-mismatched item 2 history-list
+
+;      show "showing prop"
+;      show item 0 history-list
+;
+;      show "showing times-connected"
+;      show times-connected
+;
+;      show "showing was-mismatched"
+;      show was-mismatched
+
+      set times-connected fput ticks times-connected  ;; most recent at front
+
+      ifelse [color] of (node x) != my-color [
+        set was-mismatched fput 1 was-mismatched  ;; it was mismatched
+      ] [
+        set was-mismatched fput 0 was-mismatched  ;; it was not mismatched
       ]
 
-      let new-total-count old-total-count + 1
 
-      let proportion-of-mismatch new-mismatch-count / new-total-count
 
-      table:put history-dict x (list proportion-of-mismatch new-mismatch-count new-total-count)
+      let proportion-of-mismatch get-proportion-of-mismatch times-connected was-mismatched
+
+      table:put history-dict x (list proportion-of-mismatch times-connected was-mismatched)
     ]
 
     set who-i-will-link-with get-below-threshold-from-table history-dict color-mismatch-tolerance
@@ -271,6 +293,43 @@ to update-reputational-information [a-node]
     ;; show history-dict
   ]
 
+end
+
+to-report get-proportion-of-mismatch [times-connected was-mismatched]
+
+;  show "showing times-connected"
+;  show times-connected
+;
+;  show "showing was-mismatched"
+;  show was-mismatched
+
+  let total-count 0
+  let mismatch-count 0
+
+  let prop-of-mismatch 0
+
+  let counter 0
+
+
+  while [counter < length times-connected and (item counter times-connected >= ticks - memory-duration)]
+   [
+      set total-count total-count + 1
+
+        if item counter was-mismatched = 0 [
+          set mismatch-count mismatch-count + 1
+        ]
+
+      set counter counter + 1
+    ]
+
+
+  if (total-count > 0)[
+    report mismatch-count / total-count
+  ]
+
+
+
+  report 0
 end
 
 ;; writing these function to be intelligent is the hard part
@@ -574,7 +633,8 @@ to-report get-below-threshold-from-table [table thresh]
 
     let connect-time 10 ;; you have to be connected for 10 ticks to get blacklisted
 
-    if (this-number < thresh or ticks-connected < connect-time) [ ;; if you have messed me up less than the allowable theshold or we haven't connected that much, you can still connect
+    ;; or ticks-connected < connect-time
+    if (this-number < thresh ) [ ;; if you have messed me up less than the allowable theshold or we haven't connected that much, you can still connect
       set below-keys fput key below-keys
     ]
 
@@ -935,7 +995,7 @@ CHOOSER
 adversarial-placement
 adversarial-placement
 "high" "medium" "low"
-0
+2
 
 INPUTBOX
 2
@@ -943,7 +1003,7 @@ INPUTBOX
 176
 492
 input-file-name
-Lattice1
+WattsStrogratz1
 1
 0
 String
@@ -957,7 +1017,7 @@ memory-duration
 memory-duration
 1
 100
-10.0
+46.0
 1
 1
 NIL
