@@ -217,7 +217,7 @@ to go
   ]
 
   if (ticks mod write-network-freq = 0)[
-    write-network-to-file word "networks/" (word (word input-file-name "/") (word ticks (word "_" (word behaviorspace-run-number (word output-file-name ".xml" )))))
+    write-network-to-file word "networks/" (word (word input-file-name "/") (word ticks (word "_" (word behaviorspace-run-number (word output-file-name ".txt" )))))
   ]
 
 
@@ -652,7 +652,47 @@ end
 
 
 to write-network-to-file [file_name]
-  nw:save-graphml  file_name  ;; figure out whether this is the format I want, graphml seems like overkill
+  ;;nw:save-matrix file_name
+
+  ;;nw:save-graphml  file_name  ;; figure out whether this is the format I want, graphml seems like overkill
+
+  file-open file_name
+
+  ask nodes [
+    file-type "["
+    file-write who file-type "," file-write color file-type "," file-write is-adversarial file-type ","
+    file-type "["
+
+    let n [who] of link-neighbors
+    let counter 0
+
+    while [counter < length n][
+
+      file-write item counter n
+
+      if counter < (length n) - 1 [
+        file-type ","
+      ]
+
+
+      set counter counter + 1
+
+    ]
+
+    file-type "]"
+;
+;    foreach [who] of link-neighbors [
+;    x ->
+;      file-write x
+;    file-type ","
+;
+;    ]
+
+    file-print "],\n"
+  ]
+
+
+  file-close
 
 end
 @#$#@#$#@
