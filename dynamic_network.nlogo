@@ -216,11 +216,17 @@ to go
     show coop-prop
   ]
 
+  if (ticks mod write-network-freq = 0)[
+    write-network-to-file word "networks/" (word (word input-file-name "/") (word ticks (word "_" (word behaviorspace-run-number (word output-file-name ".xml" )))))
+  ]
+
+
+
   ;; CONSIDER CHANGING THE TICKS IN THE ROW
   ifelse (last-mismatch-time < (ticks - 5)) [ ;; if you are all the same color for 5 ticks, you did almost did it, FIGURE HOW TO DEFEND THIS, maybe like a momentum thing -- need it to settle
     if (check-if-cooperators-form-connected-component) [
       show word "colors converged! after " ticks
-      if (write-final-network-to-file)[
+      if (write-networks-to-file)[
         write-network-to-file word "networks/" (word output-file-name ".xml" )
       ]
       stop
@@ -228,7 +234,7 @@ to go
   ] [
     if (ticks > 500) [ ;; you took too long
       show "colors did not converge"
-      if (write-final-network-to-file)[
+      if (write-networks-to-file)[
         write-network-to-file word "networks/" (word output-file-name ".xml" )
       ]
       stop
@@ -883,7 +889,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-0
+1
 
 CHOOSER
 192
@@ -970,9 +976,9 @@ SWITCH
 559
 199
 592
-write-final-network-to-file
-write-final-network-to-file
-1
+write-networks-to-file
+write-networks-to-file
+0
 1
 -1000
 
@@ -982,7 +988,7 @@ INPUTBOX
 321
 558
 output-file-name
-run1
+run
 1
 0
 String
@@ -1003,7 +1009,7 @@ INPUTBOX
 176
 492
 input-file-name
-WattsStrogratz1
+Watts_Strogatz1
 1
 0
 String
@@ -1016,8 +1022,23 @@ SLIDER
 memory-duration
 memory-duration
 1
-100
-46.0
+500
+465.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+272
+572
+444
+605
+write-network-freq
+write-network-freq
+1
+10
+5.0
 1
 1
 NIL
