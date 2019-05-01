@@ -659,18 +659,38 @@ to write-network-to-file [file_name]
   file-open file_name
 
   ask nodes [
+    file-type "["
     file-write who file-type "," file-write color file-type "," file-write is-adversarial file-type ","
     file-type "["
 
-    foreach [who] of link-neighbors [
-    x ->
-      file-write x
-    file-type ","
+    let n [who] of link-neighbors
+    let counter 0
+
+    while [counter < length n][
+
+      file-write item counter n
+
+      if counter < (length n) - 1 [
+        file-type ","
+      ]
+
+
+      set counter counter + 1
 
     ]
 
-    file-print "]\n"
+    file-type "]"
+;
+;    foreach [who] of link-neighbors [
+;    x ->
+;      file-write x
+;    file-type ","
+;
+;    ]
+
+    file-print "],\n"
   ]
+
 
   file-close
 
