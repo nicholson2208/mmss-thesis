@@ -14,4 +14,4 @@ cd /software/netlogo/6.0.1
 netlogo-headless.sh \
 --model /projects/p30553/mmss-thesis/dynamic_model.nlogo \
 --experiment fixed_dis \
--- table /projects/p30553/mmss-thesis/BehaviorSearch_output/fixed_dis.csv
+--table /projects/p30553/mmss-thesis/BehaviorSearch_output/fixed_dis.csv
