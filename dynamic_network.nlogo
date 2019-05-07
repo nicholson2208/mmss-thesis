@@ -217,7 +217,7 @@ to go
   ]
 
   if (ticks mod write-network-freq = 0)[
-    write-network-to-file word "networks/" (word (word input-file-name "/") (word ticks (word "_" (word behaviorspace-run-number (word output-file-name ".txt" )))))
+    write-network-to-file word "networks/" (word (word input-file-name "/") (word output-file-name (word "_" (word behaviorspace-run-number (word "_" (word ticks  ".txt" ))))))
   ]
 
 
@@ -227,7 +227,7 @@ to go
     if (check-if-cooperators-form-connected-component) [
       show word "colors converged! after " ticks
       if (write-networks-to-file)[
-        write-network-to-file word "networks/" (word output-file-name ".xml" )
+        write-network-to-file word "networks/" (word (word input-file-name "/") (word output-file-name (word "_" (word behaviorspace-run-number (word "_" (word "final"  ".txt" ))))))
       ]
       stop
     ]
@@ -235,7 +235,7 @@ to go
     if (ticks > 500) [ ;; you took too long
       show "colors did not converge"
       if (write-networks-to-file)[
-        write-network-to-file word "networks/" (word output-file-name ".xml" )
+        write-network-to-file word "networks/" (word (word input-file-name "/") (word output-file-name (word "_" (word behaviorspace-run-number (word "_" (word "final"  ".txt" ))))))
       ]
       stop
     ]
@@ -990,7 +990,7 @@ color-mismatch-tolerance
 color-mismatch-tolerance
 0
 1
-0.78
+0.21
 0.01
 1
 NIL
@@ -1063,7 +1063,7 @@ memory-duration
 memory-duration
 1
 500
-465.0
+100.0
 1
 1
 NIL
