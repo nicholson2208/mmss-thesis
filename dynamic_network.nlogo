@@ -747,7 +747,7 @@ number-of-adversarial
 number-of-adversarial
 0
 50
-20.0
+50.0
 1
 1
 NIL
@@ -881,7 +881,7 @@ SWITCH
 81
 is-network-fixed
 is-network-fixed
-1
+0
 1
 -1000
 
@@ -929,7 +929,7 @@ CHOOSER
 connection-strategy
 connection-strategy
 "random" "reputation"
-1
+0
 
 CHOOSER
 192
@@ -949,7 +949,7 @@ CHOOSER
 adversary-color-change-strategy
 adversary-color-change-strategy
 "blend in" "disengaged"
-0
+1
 
 TEXTBOX
 262
@@ -1028,7 +1028,7 @@ INPUTBOX
 321
 558
 output-file-name
-run
+test
 1
 0
 String
@@ -1041,7 +1041,7 @@ CHOOSER
 adversarial-placement
 adversarial-placement
 "high" "medium" "low"
-2
+0
 
 INPUTBOX
 2
@@ -1049,7 +1049,7 @@ INPUTBOX
 176
 492
 input-file-name
-Watts_Strogatz1
+Watts_Strogatz2
 1
 0
 String
@@ -1430,6 +1430,534 @@ NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="fixed_dis" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="501"/>
+    <metric>(count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes with [is-adversarial = 0])]) / number-of-nodes</metric>
+    <metric>(count nodes with [is-adversarial = 0]) / (number-of-nodes)</metric>
+    <enumeratedValueSet variable="is-network-fixed">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="enforce-max-links">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-adversarial">
+      <value value="10"/>
+      <value value="30"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-nodes">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory-duration">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="color-mismatch-tolerance">
+      <value value="0.21"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="connection-strategy">
+      <value value="&quot;random&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-colors">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-network-structure">
+      <value value="&quot;from-file&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cooperator-color-change-strategy">
+      <value value="&quot;naive-majority-vote&quot;"/>
+      <value value="&quot;social-majority-vote&quot;"/>
+      <value value="&quot;reputation-majority-vote&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-networks-to-file">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="input-file-name">
+      <value value="&quot;Barabasi1&quot;"/>
+      <value value="&quot;Barabasi2&quot;"/>
+      <value value="&quot;Barabasi3&quot;"/>
+      <value value="&quot;Barabasi4&quot;"/>
+      <value value="&quot;Barabasi5&quot;"/>
+      <value value="&quot;Erdos_Renyi1&quot;"/>
+      <value value="&quot;Erdos_Renyi2&quot;"/>
+      <value value="&quot;Erdos_Renyi3&quot;"/>
+      <value value="&quot;Erdos_Renyi4&quot;"/>
+      <value value="&quot;Erdos_Renyi5&quot;"/>
+      <value value="&quot;Lattice1&quot;"/>
+      <value value="&quot;Watts_Strogatz1&quot;"/>
+      <value value="&quot;Watts_Strogatz2&quot;"/>
+      <value value="&quot;Watts_Strogatz3&quot;"/>
+      <value value="&quot;Watts_Strogatz4&quot;"/>
+      <value value="&quot;Watts_Strogatz5&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversarial-placement">
+      <value value="&quot;low&quot;"/>
+      <value value="&quot;medium&quot;"/>
+      <value value="&quot;high&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-color-change-strategy">
+      <value value="&quot;disengaged&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="output-file-name">
+      <value value="&quot;fixed_dis&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-network-freq">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-act-bad-proportion">
+      <value value="1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="random_dis" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="501"/>
+    <metric>(count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes with [is-adversarial = 0])]) / number-of-nodes</metric>
+    <metric>(count nodes with [is-adversarial = 0]) / (number-of-nodes)</metric>
+    <enumeratedValueSet variable="is-network-fixed">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="enforce-max-links">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-adversarial">
+      <value value="10"/>
+      <value value="30"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-nodes">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory-duration">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="color-mismatch-tolerance">
+      <value value="0.21"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="connection-strategy">
+      <value value="&quot;random&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-colors">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-network-structure">
+      <value value="&quot;from-file&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cooperator-color-change-strategy">
+      <value value="&quot;naive-majority-vote&quot;"/>
+      <value value="&quot;social-majority-vote&quot;"/>
+      <value value="&quot;reputation-majority-vote&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-networks-to-file">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="input-file-name">
+      <value value="&quot;Barabasi1&quot;"/>
+      <value value="&quot;Barabasi2&quot;"/>
+      <value value="&quot;Barabasi3&quot;"/>
+      <value value="&quot;Barabasi4&quot;"/>
+      <value value="&quot;Barabasi5&quot;"/>
+      <value value="&quot;Erdos_Renyi1&quot;"/>
+      <value value="&quot;Erdos_Renyi2&quot;"/>
+      <value value="&quot;Erdos_Renyi3&quot;"/>
+      <value value="&quot;Erdos_Renyi4&quot;"/>
+      <value value="&quot;Erdos_Renyi5&quot;"/>
+      <value value="&quot;Lattice1&quot;"/>
+      <value value="&quot;Watts_Strogatz1&quot;"/>
+      <value value="&quot;Watts_Strogatz2&quot;"/>
+      <value value="&quot;Watts_Strogatz3&quot;"/>
+      <value value="&quot;Watts_Strogatz4&quot;"/>
+      <value value="&quot;Watts_Strogatz5&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversarial-placement">
+      <value value="&quot;low&quot;"/>
+      <value value="&quot;medium&quot;"/>
+      <value value="&quot;high&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-color-change-strategy">
+      <value value="&quot;disengaged&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="output-file-name">
+      <value value="&quot;random_dis&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-network-freq">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-act-bad-proportion">
+      <value value="1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="rep_dis" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="501"/>
+    <metric>(count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes with [is-adversarial = 0])]) / number-of-nodes</metric>
+    <metric>(count nodes with [is-adversarial = 0]) / (number-of-nodes)</metric>
+    <enumeratedValueSet variable="is-network-fixed">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="enforce-max-links">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-adversarial">
+      <value value="10"/>
+      <value value="30"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-nodes">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory-duration">
+      <value value="10"/>
+      <value value="50"/>
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="color-mismatch-tolerance">
+      <value value="0.25"/>
+      <value value="0.5"/>
+      <value value="0.75"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="connection-strategy">
+      <value value="&quot;reputation&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-colors">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-network-structure">
+      <value value="&quot;from-file&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cooperator-color-change-strategy">
+      <value value="&quot;naive-majority-vote&quot;"/>
+      <value value="&quot;social-majority-vote&quot;"/>
+      <value value="&quot;reputation-majority-vote&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-networks-to-file">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="input-file-name">
+      <value value="&quot;Barabasi1&quot;"/>
+      <value value="&quot;Barabasi2&quot;"/>
+      <value value="&quot;Barabasi3&quot;"/>
+      <value value="&quot;Barabasi4&quot;"/>
+      <value value="&quot;Barabasi5&quot;"/>
+      <value value="&quot;Erdos_Renyi1&quot;"/>
+      <value value="&quot;Erdos_Renyi2&quot;"/>
+      <value value="&quot;Erdos_Renyi3&quot;"/>
+      <value value="&quot;Erdos_Renyi4&quot;"/>
+      <value value="&quot;Erdos_Renyi5&quot;"/>
+      <value value="&quot;Lattice1&quot;"/>
+      <value value="&quot;Watts_Strogatz1&quot;"/>
+      <value value="&quot;Watts_Strogatz2&quot;"/>
+      <value value="&quot;Watts_Strogatz3&quot;"/>
+      <value value="&quot;Watts_Strogatz4&quot;"/>
+      <value value="&quot;Watts_Strogatz5&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversarial-placement">
+      <value value="&quot;low&quot;"/>
+      <value value="&quot;medium&quot;"/>
+      <value value="&quot;high&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-color-change-strategy">
+      <value value="&quot;disengaged&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="output-file-name">
+      <value value="&quot;rep_dis&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-network-freq">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-act-bad-proportion">
+      <value value="1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="fixed_blend" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="501"/>
+    <metric>(count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes with [is-adversarial = 0])]) / number-of-nodes</metric>
+    <metric>(count nodes with [is-adversarial = 0]) / (number-of-nodes)</metric>
+    <enumeratedValueSet variable="is-network-fixed">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="enforce-max-links">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-adversarial">
+      <value value="10"/>
+      <value value="30"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-nodes">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory-duration">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="color-mismatch-tolerance">
+      <value value="0.21"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="connection-strategy">
+      <value value="&quot;random&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-colors">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-network-structure">
+      <value value="&quot;from-file&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cooperator-color-change-strategy">
+      <value value="&quot;naive-majority-vote&quot;"/>
+      <value value="&quot;social-majority-vote&quot;"/>
+      <value value="&quot;reputation-majority-vote&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-networks-to-file">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="input-file-name">
+      <value value="&quot;Barabasi1&quot;"/>
+      <value value="&quot;Barabasi2&quot;"/>
+      <value value="&quot;Barabasi3&quot;"/>
+      <value value="&quot;Barabasi4&quot;"/>
+      <value value="&quot;Barabasi5&quot;"/>
+      <value value="&quot;Erdos_Renyi1&quot;"/>
+      <value value="&quot;Erdos_Renyi2&quot;"/>
+      <value value="&quot;Erdos_Renyi3&quot;"/>
+      <value value="&quot;Erdos_Renyi4&quot;"/>
+      <value value="&quot;Erdos_Renyi5&quot;"/>
+      <value value="&quot;Lattice1&quot;"/>
+      <value value="&quot;Watts_Strogatz1&quot;"/>
+      <value value="&quot;Watts_Strogatz2&quot;"/>
+      <value value="&quot;Watts_Strogatz3&quot;"/>
+      <value value="&quot;Watts_Strogatz4&quot;"/>
+      <value value="&quot;Watts_Strogatz5&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversarial-placement">
+      <value value="&quot;low&quot;"/>
+      <value value="&quot;medium&quot;"/>
+      <value value="&quot;high&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-color-change-strategy">
+      <value value="&quot;blend in&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="output-file-name">
+      <value value="&quot;fixed_blend&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-network-freq">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-act-bad-proportion">
+      <value value="0.5"/>
+      <value value="0.75"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="random_blend" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="501"/>
+    <metric>(count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes with [is-adversarial = 0])]) / number-of-nodes</metric>
+    <metric>(count nodes with [is-adversarial = 0]) / (number-of-nodes)</metric>
+    <enumeratedValueSet variable="is-network-fixed">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="enforce-max-links">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-adversarial">
+      <value value="10"/>
+      <value value="30"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-nodes">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory-duration">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="color-mismatch-tolerance">
+      <value value="0.21"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="connection-strategy">
+      <value value="&quot;random&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-colors">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-network-structure">
+      <value value="&quot;from-file&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cooperator-color-change-strategy">
+      <value value="&quot;naive-majority-vote&quot;"/>
+      <value value="&quot;social-majority-vote&quot;"/>
+      <value value="&quot;reputation-majority-vote&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-networks-to-file">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="input-file-name">
+      <value value="&quot;Barabasi1&quot;"/>
+      <value value="&quot;Barabasi2&quot;"/>
+      <value value="&quot;Barabasi3&quot;"/>
+      <value value="&quot;Barabasi4&quot;"/>
+      <value value="&quot;Barabasi5&quot;"/>
+      <value value="&quot;Erdos_Renyi1&quot;"/>
+      <value value="&quot;Erdos_Renyi2&quot;"/>
+      <value value="&quot;Erdos_Renyi3&quot;"/>
+      <value value="&quot;Erdos_Renyi4&quot;"/>
+      <value value="&quot;Erdos_Renyi5&quot;"/>
+      <value value="&quot;Lattice1&quot;"/>
+      <value value="&quot;Watts_Strogatz1&quot;"/>
+      <value value="&quot;Watts_Strogatz2&quot;"/>
+      <value value="&quot;Watts_Strogatz3&quot;"/>
+      <value value="&quot;Watts_Strogatz4&quot;"/>
+      <value value="&quot;Watts_Strogatz5&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversarial-placement">
+      <value value="&quot;low&quot;"/>
+      <value value="&quot;medium&quot;"/>
+      <value value="&quot;high&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-color-change-strategy">
+      <value value="&quot;blend in&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="output-file-name">
+      <value value="&quot;random_blend&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-network-freq">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-act-bad-proportion">
+      <value value="0.5"/>
+      <value value="0.75"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="rep_blend" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="501"/>
+    <metric>(count nodes with [is-adversarial = 0 and color = item 0 (modes [color] of nodes with [is-adversarial = 0])]) / number-of-nodes</metric>
+    <metric>(count nodes with [is-adversarial = 0]) / (number-of-nodes)</metric>
+    <enumeratedValueSet variable="is-network-fixed">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="enforce-max-links">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-adversarial">
+      <value value="10"/>
+      <value value="30"/>
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-nodes">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory-duration">
+      <value value="10"/>
+      <value value="50"/>
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="color-mismatch-tolerance">
+      <value value="0.25"/>
+      <value value="0.5"/>
+      <value value="0.75"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="connection-strategy">
+      <value value="&quot;reputation&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-colors">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-network-structure">
+      <value value="&quot;from-file&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cooperator-color-change-strategy">
+      <value value="&quot;naive-majority-vote&quot;"/>
+      <value value="&quot;social-majority-vote&quot;"/>
+      <value value="&quot;reputation-majority-vote&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-networks-to-file">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="input-file-name">
+      <value value="&quot;Barabasi1&quot;"/>
+      <value value="&quot;Barabasi2&quot;"/>
+      <value value="&quot;Barabasi3&quot;"/>
+      <value value="&quot;Barabasi4&quot;"/>
+      <value value="&quot;Barabasi5&quot;"/>
+      <value value="&quot;Erdos_Renyi1&quot;"/>
+      <value value="&quot;Erdos_Renyi2&quot;"/>
+      <value value="&quot;Erdos_Renyi3&quot;"/>
+      <value value="&quot;Erdos_Renyi4&quot;"/>
+      <value value="&quot;Erdos_Renyi5&quot;"/>
+      <value value="&quot;Lattice1&quot;"/>
+      <value value="&quot;Watts_Strogatz1&quot;"/>
+      <value value="&quot;Watts_Strogatz2&quot;"/>
+      <value value="&quot;Watts_Strogatz3&quot;"/>
+      <value value="&quot;Watts_Strogatz4&quot;"/>
+      <value value="&quot;Watts_Strogatz5&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-links">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversarial-placement">
+      <value value="&quot;low&quot;"/>
+      <value value="&quot;medium&quot;"/>
+      <value value="&quot;high&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-color-change-strategy">
+      <value value="&quot;blend in&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="output-file-name">
+      <value value="&quot;rep_blend&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="write-network-freq">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="adversary-act-bad-proportion">
+      <value value="0.5"/>
+      <value value="0.75"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
