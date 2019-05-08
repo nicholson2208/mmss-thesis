@@ -1,12 +1,8 @@
 ;;@author: Matt Nicholson
 
-;; tolerance varying over time, forgiveness in memory
 ;; network not changing
 ;; limit number of times color can change
 ;; ban certain people at halfway
-;; come up with metrics to report at the end
-
-
 
 
 extensions [
@@ -881,7 +877,7 @@ SWITCH
 81
 is-network-fixed
 is-network-fixed
-0
+1
 1
 -1000
 
@@ -1028,7 +1024,7 @@ INPUTBOX
 321
 558
 output-file-name
-test
+random_dis
 1
 0
 String
@@ -1041,7 +1037,7 @@ CHOOSER
 adversarial-placement
 adversarial-placement
 "high" "medium" "low"
-0
+2
 
 INPUTBOX
 2
@@ -1049,7 +1045,7 @@ INPUTBOX
 176
 492
 input-file-name
-Watts_Strogatz2
+Watts_Strogatz5
 1
 0
 String
