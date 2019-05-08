@@ -6,7 +6,6 @@
 
 
 extensions [
-  ;csv
   table
   nw
 ]
@@ -1427,7 +1426,7 @@ NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="fixed_dis" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="fixed_dis" repetitions="100" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="501"/>
@@ -1441,7 +1440,6 @@ NetLogo 6.0.4
     </enumeratedValueSet>
     <enumeratedValueSet variable="number-of-adversarial">
       <value value="10"/>
-      <value value="30"/>
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="number-of-nodes">
@@ -1472,21 +1470,9 @@ NetLogo 6.0.4
     </enumeratedValueSet>
     <enumeratedValueSet variable="input-file-name">
       <value value="&quot;Barabasi1&quot;"/>
-      <value value="&quot;Barabasi2&quot;"/>
-      <value value="&quot;Barabasi3&quot;"/>
-      <value value="&quot;Barabasi4&quot;"/>
-      <value value="&quot;Barabasi5&quot;"/>
       <value value="&quot;Erdos_Renyi1&quot;"/>
-      <value value="&quot;Erdos_Renyi2&quot;"/>
-      <value value="&quot;Erdos_Renyi3&quot;"/>
-      <value value="&quot;Erdos_Renyi4&quot;"/>
-      <value value="&quot;Erdos_Renyi5&quot;"/>
       <value value="&quot;Lattice1&quot;"/>
       <value value="&quot;Watts_Strogatz1&quot;"/>
-      <value value="&quot;Watts_Strogatz2&quot;"/>
-      <value value="&quot;Watts_Strogatz3&quot;"/>
-      <value value="&quot;Watts_Strogatz4&quot;"/>
-      <value value="&quot;Watts_Strogatz5&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="number-of-links">
       <value value="2"/>
@@ -1496,7 +1482,6 @@ NetLogo 6.0.4
     </enumeratedValueSet>
     <enumeratedValueSet variable="adversarial-placement">
       <value value="&quot;low&quot;"/>
-      <value value="&quot;medium&quot;"/>
       <value value="&quot;high&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="adversary-color-change-strategy">
