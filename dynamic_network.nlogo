@@ -533,7 +533,7 @@ to link-formation
 
   if initial-network-structure = "preferential"[
     ;; still need to change link-breed to direct, should I?? I think maybe no
-    nw:generate-preferential-attachment nodes links number-of-nodes 1 ;; make min degree 1
+    ;nw:generate-preferential-attachment nodes links number-of-nodes 1 ;; make min degree 1
     change-node-to-adversarial number-of-adversarial
   ]
 
@@ -727,7 +727,7 @@ number-of-nodes
 number-of-nodes
 3
 100
-100.0
+0.0
 1
 1
 NIL
@@ -742,7 +742,7 @@ number-of-adversarial
 number-of-adversarial
 0
 50
-50.0
+0.0
 1
 1
 NIL
@@ -808,7 +808,7 @@ number-of-colors
 number-of-colors
 1
 13
-10.0
+0.0
 1
 1
 NIL
@@ -863,7 +863,7 @@ number-of-links
 number-of-links
 0
 20
-2.0
+0.0
 1
 1
 NIL
@@ -985,7 +985,7 @@ color-mismatch-tolerance
 color-mismatch-tolerance
 0
 1
-0.21
+0.0
 0.01
 1
 NIL
@@ -1000,7 +1000,7 @@ adversary-act-bad-proportion
 adversary-act-bad-proportion
 0
 1
-1.0
+0.0
 0.01
 1
 NIL
@@ -1023,7 +1023,7 @@ INPUTBOX
 321
 558
 output-file-name
-random_dis
+0
 1
 0
 String
@@ -1044,7 +1044,7 @@ INPUTBOX
 176
 492
 input-file-name
-Watts_Strogatz5
+0
 1
 0
 String
@@ -1058,7 +1058,7 @@ memory-duration
 memory-duration
 1
 500
-100.0
+0.0
 1
 1
 NIL
@@ -1073,7 +1073,7 @@ write-network-freq
 write-network-freq
 1
 10
-5.0
+0.0
 1
 1
 NIL
@@ -1421,7 +1421,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0.4
+NetLogo 6.0.2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -1491,7 +1491,7 @@ NetLogo 6.0.4
       <value value="&quot;fixed_dis&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="write-network-freq">
-      <value value="5"/>
+      <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="adversary-act-bad-proportion">
       <value value="1"/>
